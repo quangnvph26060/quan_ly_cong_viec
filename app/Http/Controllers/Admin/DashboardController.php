@@ -15,22 +15,23 @@ class DashboardController extends Controller
         $date_from = isset($request->date_from) ? $request->date_from : date("Y-m-01");
         $date_end = isset($request->date_end) ? $request->date_end : date("Y-m-d");
         $users = User::with([
-                        'kpis' => function ($query) use ($date_from, $date_end) {
-                            $query->whereBetween("date", [$date_from, $date_end]);
-                        },
-                        'log_missions' => function ($query) use ($date_from, $date_end) {
-                            $query->whereBetween('date', [$date_from, $date_end]);
-                        }
-                    ])
-                    ->where("status", 1)
-                    ->get();
+            'kpis' => function ($query) use ($date_from, $date_end) {
+                $query->whereBetween("date", [$date_from, $date_end]);
+            },
+            'log_missions' => function ($query) use ($date_from, $date_end) {
+                $query->whereBetween('date', [$date_from, $date_end]);
+            }
+        ])
+            ->where("status", 1)
+            ->get();
         $totalPostEditAndPublish = Mission::whereBetween("date", [$date_from, $date_end])->get();
-
+        $activeUsers = User::where('status', 1)->count();
         return view('admins.pages.dashboard_new', [
             'date_from' => $date_from,
             'date_end' => $date_end,
             'totalPostEditAndPublish' => $totalPostEditAndPublish,
             'users' => $users,
+            'activeUsers' => $activeUsers
         ]);
         // $kpis = SettingKpi::latest()
         //                   ->get();
@@ -84,15 +85,15 @@ class DashboardController extends Controller
         $yAxis = $xAxis = [];
         $date = isset($request->date) ? $request->date : date('Y-m-d');
         $missions = Mission::where('date', $date)
-                           ->join("users", "users.id", "=", "missions.user_id")
-                           ->get(["users.email", "missions.*"])
-                           ->groupBy("email");
+            ->join("users", "users.id", "=", "missions.user_id")
+            ->get(["users.email", "missions.*"])
+            ->groupBy("email");
         foreach ($missions as $email => $missionByUser) {
             $xAxis[] = $email;
             if (count($missionByUser) == 0) {
                 $yAxis[] = 0;
             } else {
-                $yAxis[] = 100 * count($missionByUser->where('status', '>', 0))/count($missionByUser);
+                $yAxis[] = 100 * count($missionByUser->where('status', '>', 0)) / count($missionByUser);
             }
         }
 

@@ -148,7 +148,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.', 'mi
         Route::delete('delete/{id}', [PaymentSlipController::class, 'delete'])->name('delete');
     });
     Route::get('/logout', 'DashboardController@logout')->name('logout');
-    Route::get('/', 'DashboardController@dashboard')->name('dashboard')->middleware("role-admin");
+    Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard')->middleware("role-admin");
 
     Route::group(["prefix" => "check-in", "as" => "check-in.",'middleware' => 'role-admin'], function () {
         Route::get("/", 'CheckInController@index')->name("index");
