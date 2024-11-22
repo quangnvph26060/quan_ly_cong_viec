@@ -22,7 +22,6 @@ class ClientController extends Controller
     {
         try {
             $clients = $this->clientService->getPaginatedClient();
-
             if ($request->ajax()) {
                 return response()->json([
                     'html' => view('admins.pages.client.table', compact('clients'))->render(),
@@ -45,8 +44,33 @@ class ClientController extends Controller
 
     public function store(Request $request)
     {
+        // Validation cho các trường dữ liệu và ảnh
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
+            'email' => 'nullable|email',
+            'company_name' => 'nullable|string|max:255',
+            'tax_number' => 'nullable|string|max:255',
+            'address' => 'required|string',
+            'field' => 'nullable|string|max:255',
+            'note' => 'nullable|string',
+            'front_id_image' => 'required|mimes:jpeg,jpg,png,gif|max:2048',
+            'back_id_image' => 'required|mimes:jpeg,jpg,png,gif|max:2048',
+            'other_images.*' => 'nullable|mimes:jpeg,jpg,png,gif|max:2048',
+        ], [
+            'front_id_image.required' => 'Ảnh mặt trước CMND là bắt buộc.',
+            'back_id_image.required' => 'Ảnh mặt sau CMND là bắt buộc.',
+            'front_id_image.mimes' => 'Chỉ chấp nhận file hình ảnh với định dạng: jpeg, jpg, png, gif.',
+            'back_id_image.mimes' => 'Chỉ chấp nhận file hình ảnh với định dạng: jpeg, jpg, png, gif.',
+            'front_id_image.max' => 'Kích thước ảnh mặt trước không được vượt quá 10MB.',
+            'back_id_image.max' => 'Kích thước ảnh mặt sau không được vượt quá 10MB.',
+            'other_images.*.mimes' => 'Các file ảnh khác chỉ được có định dạng: jpeg, jpg, png, gif.',
+            'other_images.*.max' => 'Kích thước mỗi file ảnh khác không được vượt quá 2MB.',
+        ]);
+
         try {
-            $client = $this->clientService->addNewClient($request->all());
+            // Lưu khách hàng và xử lý ảnh
+            $client = $this->clientService->addNewClient($validatedData, $request);
 
             // Lấy danh sách khách hàng đã được cập nhật và HTML phân trang
             $clients = $this->clientService->getPaginatedClient(); // Lấy danh sách khách hàng với phân trang
@@ -65,6 +89,7 @@ class ClientController extends Controller
         }
     }
 
+
     public function addByLink()
     {
         return view('admins.pages.client.link');
@@ -72,13 +97,11 @@ class ClientController extends Controller
 
     public function storeByLink(Request $request)
     {
-        try{
+        try {
             $client = $this->clientService->addNewClientByLink($request->all());
             return redirect()->back()->with('success', 'Đăng ký thành công');
-        }
-        catch(Exception $e)
-        {
-            Log::error("Failed to create Client By Link: " .$e->getMessage());
+        } catch (Exception $e) {
+            Log::error("Failed to create Client By Link: " . $e->getMessage());
             return ApiResponse::error('Failed to create Client By Link', 500);
         }
     }
@@ -104,9 +127,10 @@ class ClientController extends Controller
                 'email' => 'nullable|email|max:255',
                 'company_name' => 'nullable|string|max:255',
                 'tax_number' => 'nullable|string|max:20',
-                'address' => 'required|string|max:255'
+                'address' => 'required|string|max:255',
+                'field' => 'nullable',
+                'note' => 'nullable',
             ]);
-
             // Pass the validated data as an array
             $client = $this->clientService->updateClient($validatedData, $id);
 
