@@ -20,6 +20,10 @@ class Client extends Model
         'address',
         'source',
         'field',
+        'note',
+        'front_id_image',
+        'back_id_image',
+        'other_images',
     ];
 
     public function receipt()

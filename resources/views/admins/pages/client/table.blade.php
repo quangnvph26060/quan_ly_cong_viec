@@ -10,16 +10,14 @@
                     <th data-priority="6">Tên công ty</th>
                     <th>Mã số thuế</th>
                     <th>Nguồn</th>
+                    <th>Ghi chú</th>
                     <th style="text-align: center" data-priority="7">Hành động</th>
                 </tr>
             </thead>
             <tbody>
-                @php
-                    $start = ($clients->currentPage() - 1) * $clients->perPage() + 1;
-                @endphp
                 @foreach ($clients as $key => $client)
                     <tr>
-                        <td>{{ $key + $start }}</td>
+                        <td>{{ $loop->iteration }}</td>
                         <td style="text-align: left;">
                             <a href="#" class="client-name" data-id="{{ $client->id }}">{{ $client->name }}</a>
                         </td>
@@ -40,6 +38,7 @@
                                 @default
                             @endswitch
                         </td>
+                        <td>{{ $client->note ?? '' }}</td>
                         <td style="text-align: center">
                             <a href="javascript:void(0)" data-id="{{ $client->id }}"
                                 class="btn btn-warning open-edit-modal">Sửa</a>
