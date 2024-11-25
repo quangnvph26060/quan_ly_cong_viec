@@ -23,7 +23,8 @@ class ClientImageController extends Controller
     {
         $client = Client::find($id);
         $otherImages = json_decode($client->other_images, true);
-        return view('admins.pages.client.edit', compact('client', 'otherImages'));
+        $otherFiles = json_decode($client->other_files, true);
+        return view('admins.pages.client.edit', compact('client', 'otherImages', 'otherFiles'));
     }
 
     public function updateImage(Request $request, $id)
@@ -66,22 +67,59 @@ class ClientImageController extends Controller
 
             // Xử lý các ảnh khác
             $otherImages = [];
+            $otherFiles = [];
+
+            // Kiểm tra và xử lý ảnh mới
             if ($request->hasFile('other_images')) {
-                // Xóa các ảnh cũ trong storage
-                if ($client->other_images) {
-                    $oldImages = json_decode($client->other_images, true); // Giải mã mảng JSON
-                    foreach ($oldImages as $oldImage) {
-                        if (Storage::disk('public')->exists($oldImage)) {
-                            Storage::disk('public')->delete($oldImage);
+                foreach ($request->file('other_images') as $file) {
+                    $fileName = $file->getClientOriginalName();
+                    $extension = strtolower($file->getClientOriginalExtension());
+
+                    // Nếu là ảnh, xử lý logic lưu ảnh mới
+                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'jfif'])) {
+                        // Xóa ảnh cũ chỉ khi có ảnh mới
+                        if (empty($otherImages) && $client->other_images) {
+                            $oldImages = json_decode($client->other_images, true);
+                            foreach ($oldImages as $oldImage) {
+                                if (Storage::disk('public')->exists($oldImage)) {
+                                    Storage::disk('public')->delete($oldImage);
+                                }
+                            }
                         }
+                        // Lưu ảnh mới
+                        $path = $file->storeAs('client_other_images', $fileName, 'public');
+                        $otherImages[] = $path;
+                    }
+
+                    // Nếu là file PDF, xử lý logic lưu file mới
+                    if ($extension === 'pdf') {
+                        // Xóa file cũ chỉ khi có file mới
+                        if (empty($otherFiles) && $client->other_files) {
+                            $oldFiles = json_decode($client->other_files, true);
+                            foreach ($oldFiles as $oldFile) {
+                                if (Storage::disk('public')->exists($oldFile)) {
+                                    Storage::disk('public')->delete($oldFile);
+                                }
+                            }
+                        }
+                        // Lưu file PDF mới
+                        $path = $file->storeAs('client_other_files', $fileName, 'public');
+                        $otherFiles[] = $path;
                     }
                 }
+            }
 
-                // Lưu từng ảnh mới và thêm vào mảng
-                foreach ($request->file('other_images') as $image) {
-                    $path = $image->store('client_other_images', 'public');
-                    $otherImages[] = $path;
-                }
+            // Cập nhật các trường trong database nếu có thay đổi
+            if (!empty($otherImages)) {
+                $client->other_images = json_encode($otherImages);
+            }
+            if (!empty($otherFiles)) {
+                $client->other_files = json_encode($otherFiles);
+            }
+
+            // Chỉ lưu thay đổi nếu có
+            if (!empty($otherImages) || !empty($otherFiles)) {
+                $client->save();
             }
 
             // Cập nhật thông tin ảnh nếu có
@@ -89,17 +127,42 @@ class ClientImageController extends Controller
                 $client->update($imagePaths);
             }
 
-            // Cập nhật các ảnh khác dưới dạng JSON
-            if (!empty($otherImages)) {
-                // Lưu các đường dẫn ảnh khác vào trường `other_images` dưới dạng JSON
-                $client->other_images = json_encode($otherImages);
-                $client->save();
-            }
 
-            return response()->json(['success' => 'Cập nhật ảnh thành công']);
+            return response()->json(['success' => 'Cập nhật tài liệu thành công']);
         } catch (Exception $e) {
             Log::error('Failed to update client image: ' . $e->getMessage());
             return response()->json(['error' => 'Cập nhật ảnh thất bại'], 500);
+        }
+    }
+
+    public function deleteFile($id, Request $request)
+    {
+        try {
+            $client = Client::find($id);
+            if (!$client) {
+                return response()->json(['message' => 'Khách hàng không tồn tại'], 404);
+            }
+            $fileName = $request->input('fileName');
+            if ($client->other_files) {
+                $otherFiles = json_decode($client->other_files, true);
+
+                if (Storage::disk('public')->exists($fileName)) {
+                    Storage::disk('public')->delete($fileName);
+                }
+
+                $otherFiles = array_filter($otherFiles, function ($file) use ($fileName) {
+                    return $file !== $fileName;
+                });
+
+                $otherFiles = array_values($otherFiles);
+                $client->update(['other_files' => json_encode($otherFiles)]);
+            } else {
+                return response()->json(['message' => 'File không tồn tại'], 400);
+            }
+            return response()->json(['message' => 'Xóa file thành công'], 200);
+        } catch (Exception $e) {
+            Log::error('Failed to delete this file: ' . $e->getMessage());
+            return response()->json(['message' => 'Đã xảy ra lỗi: ' . $e->getMessage()], 500);
         }
     }
 

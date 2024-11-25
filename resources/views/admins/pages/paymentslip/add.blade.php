@@ -127,7 +127,8 @@
                         customerItem.setAttribute('data-email', customer.email);
                         customerItem.setAttribute('data-phone', customer.phone);
                         customerItem.setAttribute('data-address', customer.address);
-                        customerItem.textContent = `${customer.name} (${customer.phone})`;
+                        customerItem.textContent =
+                            `${customer.name} (${customer.phone}) - ${customer.company_name}`;
                         resultsList.appendChild(customerItem);
                     });
                     noResultsItem.style.display = 'none';

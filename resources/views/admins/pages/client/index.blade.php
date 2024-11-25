@@ -3,6 +3,43 @@
 @section('content')
     <!-- Thêm CSS để căn giữa modal -->
     <style>
+        .btn-file-delete {
+            position: absolute;
+            top: 0px;
+            /* Dịch lên một chút để căn sát góc trên */
+            right: -26px;
+            /* Dịch sát bên phải */
+            background-color: red;
+            /* Màu nền của nút */
+            color: white;
+            /* Màu chữ */
+            border: none;
+            /* Bỏ đường viền */
+            font-size: 14px;
+            /* Kích thước chữ */
+            width: 20px;
+            /* Độ rộng nút */
+            height: 20px;
+            /* Chiều cao nút */
+            border-radius: 50%;
+            /* Bo tròn nút */
+            text-align: center;
+            /* Canh giữa chữ */
+            line-height: 18px;
+            /* Căn chỉnh chữ theo chiều dọc */
+            cursor: pointer;
+            /* Đổi con trỏ chuột khi hover */
+            z-index: 10;
+            /* Đảm bảo nút luôn hiển thị trên cùng */
+            transition: background-color 0.2s ease;
+            /* Hiệu ứng chuyển màu khi hover */
+        }
+
+        =.btn-file-delete:hover {
+            background-color: darkred;
+            /* Màu nền khi hover */
+        }
+
         .image-container {
             position: relative;
             display: inline-block;
@@ -132,8 +169,8 @@
                         @csrf
                         <!-- Form fields -->
                         <div class="mb-3">
-                            <label for="name" class="form-label">Họ tên <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <label for="name" class="form-label">Họ tên</label>
+                            <input type="text" class="form-control" id="name" name="name">
                             <div id="name-error" class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
@@ -142,29 +179,26 @@
                             <div id="email-error" class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
-                            <label for="phone" class="form-label">Số điện thoại <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="phone" name="phone" required>
+                            <label for="phone" class="form-label">Số điện thoại </label>
+                            <input type="text" class="form-control" id="phone" name="phone">
                             <div id="phone-error" class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
-                            <label for="front_id_image" class="form-label">Ảnh mặt trước <span
-                                    class="text-danger">*</span></label>
+                            <label for="front_id_image" class="form-label">Ảnh mặt trước </label>
                             <input type="file" class="form-control" id="front_id_image" name="front_id_image">
                         </div>
                         <div class="mb-3">
-                            <label for="back_id_image" class="form-label">Ảnh mặt sau <span
-                                    class="text-danger">*</span></label>
+                            <label for="back_id_image" class="form-label">Ảnh mặt sau</label>
                             <input type="file" class="form-control" id="back_id_image" name="back_id_image">
                         </div>
                         <div class="mb-3">
-                            <label for="other_images" class="form-label">Ảnh khác</label>
+                            <label for="other_images" class="form-label">Tài liệu khác</label>
                             <input type="file" class="form-control" id="other_images" name="other_images[]" multiple>
                         </div>
                         <div class="row mt-3" id="other_images_preview"></div>
                         <div class="mb-3">
-                            <label for="address" class="form-label">Địa chỉ <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="address" name="address" required>
+                            <label for="address" class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" id="address" name="address">
                             <div id="address-error" class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
@@ -210,8 +244,8 @@
                         <input type="hidden" id="edit-client-id" name="id">
                         <!-- Form fields (similar to add form but with IDs prefixed with 'edit-') -->
                         <div class="mb-3">
-                            <label for="edit-name" class="form-label">Họ tên <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit-name" name="name" required>
+                            <label for="edit-name" class="form-label">Họ tên</label>
+                            <input type="text" class="form-control" id="edit-name" name="name">
                             <div id="edit-name-error" class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
@@ -220,15 +254,13 @@
                             <div id="edit-email-error" class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
-                            <label for="edit-phone" class="form-label">Số điện thoại <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit-phone" name="phone" required>
+                            <label for="edit-phone" class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" id="edit-phone" name="phone">
                             <div id="edit-phone-error" class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
-                            <label for="edit-address" class="form-label">Địa chỉ <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit-address" name="address" required>
+                            <label for="edit-address" class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" id="edit-address" name="address">
                             <div id="edit-address-error" class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
@@ -304,11 +336,14 @@
                     </div>
                     </p>
                     <p>
-                        <strong>Ảnh khác:</strong><br>
+                        <strong>Tài liệu khác:</strong><br>
                     <div class="image-container" id="client-other-images-container">
                         {{-- <img id="client-other-images" src="" alt="Ảnh khác" width="150" height="150" />
                         <button type="button" class="btn-img-delete " id="delete-other-images" data-type="others"
                             aria-label="Close" hidden>&times;</button> --}}
+                    </div>
+                    <div id="client-other-files-container">
+                        <!-- Các file PDF sẽ được thêm vào đây bằng JavaScript -->
                     </div>
                     </p>
                     <p><strong>Ghi chú:</strong> <span id="client-note"></span></p>
@@ -484,7 +519,7 @@
                     method: 'GET',
                     success: function(data) {
                         const other_images = JSON.parse(data
-                        .other_images); // Kiểm tra xem dữ liệu ảnh có đúng định dạng không
+                            .other_images); // Kiểm tra xem dữ liệu ảnh có đúng định dạng không
                         const otherImagesContainer = $('#client-other-images-container');
 
                         // Xóa tất cả ảnh cũ trong container trước khi thêm ảnh mới
@@ -493,7 +528,7 @@
                         // Kiểm tra nếu không còn ảnh "Khác"
                         if (other_images.length === 0) {
                             // Nếu không còn ảnh, hiển thị thông báo
-                            otherImagesContainer.append('<div>Không có ảnh khác</div>');
+                            otherImagesContainer.append('<div>Không có ảnh</div>');
                         } else {
                             // Cập nhật lại ảnh "Khác"
                             other_images.forEach(function(other_image) {
@@ -509,7 +544,7 @@
                                     alt: 'Ảnh khác',
                                     class: 'img-fluid image-thumbnail',
                                     style: 'width: 100px; height: 100px;',
-                                });
+                                }).data('imagename', other_image);
 
                                 // Tạo nút xóa
                                 const deleteBtn = $('<button>', {
@@ -586,47 +621,53 @@
                             // Xóa tất cả ảnh cũ trong container (nếu có) trước khi thêm ảnh mới
                             otherImagesContainer.innerHTML = '';
 
-                            other_images.forEach(other_image => {
-                                // Tạo container riêng cho từng ảnh và nút xóa
-                                const imageWrapper = document.createElement('div');
-                                imageWrapper.style.position = 'relative';
-                                imageWrapper.style.display = 'inline-block';
-                                imageWrapper.style.margin = '5px'
+                            if (other_images) {
+                                other_images.forEach(other_image => {
+                                    // Tạo container riêng cho từng ảnh và nút xóa
+                                    const imageWrapper = document.createElement('div');
+                                    imageWrapper.style.position = 'relative';
+                                    imageWrapper.style.display = 'inline-block';
+                                    imageWrapper.style.margin = '5px';
 
-                                //Tạo URL cho ảnh
-                                const otherImageUrl = other_image ? `/storage/${other_image}` :
-                                    defaultImageUrl;
+                                    //Tạo URL cho ảnh
+                                    const otherImageUrl = other_image ?
+                                        `/storage/${other_image}` :
+                                        defaultImageUrl;
 
-                                //Tạo phần tử <img> mới cho ảnh
-                                const otherImageElement = document.createElement('img');
-                                otherImageElement.setAttribute('data-imagename', other_image);
-                                otherImageElement.src = otherImageUrl;
-                                otherImageElement.alt = 'Ảnh khác';
-                                otherImageElement.classList.add('img-fluid', 'image-thumbnail');
-                                otherImageElement.style.width = '100px';
-                                otherImageElement.style.height = '100px';
+                                    //Tạo phần tử <img> mới cho ảnh
+                                    const otherImageElement = document.createElement('img');
+                                    otherImageElement.setAttribute('data-imagename',
+                                        other_image);
+                                    otherImageElement.src = otherImageUrl;
+                                    otherImageElement.alt = 'Ảnh khác';
+                                    otherImageElement.classList.add('img-fluid',
+                                        'image-thumbnail');
+                                    otherImageElement.style.width = '100px';
+                                    otherImageElement.style.height = '100px';
 
-                                //Thêm ảnh vào container
-                                imageWrapper.appendChild(otherImageElement);
+                                    //Thêm ảnh vào container
+                                    imageWrapper.appendChild(otherImageElement);
 
-                                //Tạo nút xóa cho ảnh
-                                const deleteOtherImageBtn = document.createElement('button');
-                                deleteOtherImageBtn.textContent = 'x';
-                                deleteOtherImageBtn.setAttribute('data-type', 'other');
-                                deleteOtherImageBtn.classList.add('btn-img-delete');
+                                    //Tạo nút xóa cho ảnh
+                                    const deleteOtherImageBtn = document.createElement(
+                                        'button');
+                                    deleteOtherImageBtn.textContent = 'x';
+                                    deleteOtherImageBtn.setAttribute('data-type', 'other');
+                                    deleteOtherImageBtn.classList.add('btn-img-delete');
 
-                                //Ấn nút nếu không có ảnh
-                                deleteOtherImageBtn.hidden = !other_image;
+                                    //Ấn nút nếu không có ảnh
+                                    deleteOtherImageBtn.hidden = !other_image;
 
-                                //Xử lý sự kiện xóa ảnh
+                                    //Xử lý sự kiện xóa ảnh
 
 
-                                //Thêm nút xóa vào container ảnh
-                                imageWrapper.appendChild(deleteOtherImageBtn);
+                                    //Thêm nút xóa vào container ảnh
+                                    imageWrapper.appendChild(deleteOtherImageBtn);
 
-                                //Thêm container vào danh sách các ảnh
-                                otherImagesContainer.appendChild(imageWrapper);
-                            });
+                                    //Thêm container vào danh sách các ảnh
+                                    otherImagesContainer.appendChild(imageWrapper);
+                                });
+                            }
 
                             // Kiểm tra và lấy đường dẫn ảnh, nếu không có thì dùng ảnh mặc định
                             const frontIdImageUrl = data.front_id_image ?
@@ -653,6 +694,44 @@
                             } else {
                                 deleteBackImageBtn.hidden = true;
                             }
+
+
+                            var other_files = JSON.parse(data.other_files);
+                            const otherFilesContainer = document.getElementById(
+                                'client-other-files-container');
+
+                            otherFilesContainer.innerHTML = '';
+
+                            if (other_files) {
+                                other_files.forEach(other_file => {
+                                    const fileWrapper = document.createElement('div');
+                                    fileWrapper.style.position = 'relative';
+                                    fileWrapper.style.display = 'inline-block';
+                                    fileWrapper.style.margin = '5px';
+
+                                    const fileName = other_file.split('/').pop();
+                                    const fileUrl = '/storage/' + other_file;
+                                    const otherFileElement = document.createElement('a');
+                                    otherFileElement.setAttribute('data-filename', other_file);
+                                    otherFileElement.href = fileUrl;
+                                    otherFileElement.download = fileName;
+                                    otherFileElement.textContent = fileName;
+                                    otherFileElement.style.display = 'block';
+
+
+                                    fileWrapper.appendChild(otherFileElement);
+
+                                    const deleteOtherFileBtn = document.createElement('button');
+                                    deleteOtherFileBtn.textContent = 'x';
+                                    deleteOtherFileBtn.setAttribute('data-type', 'otherFile');
+                                    deleteOtherFileBtn.classList.add('btn-file-delete');
+
+                                    fileWrapper.appendChild(deleteOtherFileBtn);
+                                    otherFilesContainer.appendChild(fileWrapper);
+                                });
+                            }
+
+                            console.log(JSON.parse(data.other_files));
 
                             $('#clientModal').modal('show');
                         });
@@ -729,34 +808,109 @@
                 });
             });
 
+            $(document).on('click', '.btn-file-delete', function() {
+                let clientId = $('#client-id').text().trim();
 
+                // Lấy fileName từ data-attribute của button
+                let fileName = $(this).siblings('a').data('filename');
+                console.log(fileName);
 
-            //Xem trước ảnh mục "Ảnh khác"
-            function previewOtherImages() {
-                const previewContainer = document.getElementById('other_images_preview');
-                previewContainer.innerHTML = '';
-                const files = document.getElementById('other_images').files;
+                let deleteUrl = "{{ route('admin.client.deleteFile', ':id') }}".replace(':id', clientId);
 
-                if (files.length > 0) {
-                    for (let i = 0; i < filed.length; i++) {
-                        const file = file[i];
-                        const reader = new FileReader();
+                Swal.fire({
+                    title: 'Bạn có muốn xóa file này?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: deleteUrl,
+                            type: 'DELETE',
+                            data: {
+                                _token: "{{ csrf_token() }} ",
+                                fileName: fileName,
+                            },
 
-                        reader.onload = function(e) {
-                            const img = document.createElement('img');
-                            img.src = e.target.result;
-                            img.alt = 'Image Preview';
-                            img.style.width = '100px';
-                            img.style.height = '100px';
-                            img.style.objectFit = 'cover';
-                            previewContainer.appendChild(img);
-                        };
+                            success: function(response) {
+                                Swal.fire(
+                                    'Xóa file thành công!',
+                                    response.message,
+                                    'success'
+                                );
 
-                        reader.readAsDataURL(file);
+                                $(this).closest('div')
+                                    .remove(); // Dùng self thay vì this
+                                updateOtherFileList(clientId);
+                            },
+
+                            error: function(xhr) {
+                                Swal.fire(
+                                    'Lỗi!',
+                                    xhr.responseJSON.message ||
+                                    'Đã xảy ra lỗi khi xóa file',
+                                    'error'
+                                );
+                            },
+                        });
                     }
-                }
-            }
+                });
+            });
 
+
+            function updateOtherFileList(clientId) {
+                $.ajax({
+                    url: `/admin/receipt/client/${clientId}`,
+                    method: 'GET',
+                    success: function(data) {
+                        // Kiểm tra xem data.other_files có tồn tại không và có phải là mảng không
+                        const other_files = Array.isArray(data.other_files) ? data.other_files : JSON
+                            .parse(data.other_files);
+                        const otherFileContainer = $(
+                            '#client-other-files-container'); // Sửa lại tên biến đúng
+
+                        // Clear các file cũ
+                        otherFileContainer.empty();
+
+                        // Kiểm tra và hiển thị thông báo nếu không có file
+                        if (other_files.length === 0) {
+                            otherFileContainer.append('<div>Không có file</div>');
+                        } else {
+                            other_files.forEach(function(other_file) {
+                                const fileWrapper = $('<div>', {
+                                    style: 'position: relative; display: inline-block; margin: 5px;',
+                                });
+                                const fileUrl = '/storage/' + other_file;
+                                const fileName = other_file.split('/')
+                                    .pop(); // Lấy tên file từ đường dẫn
+                                const fileElement = $('<a>', {
+                                    href: fileUrl,
+                                    download: fileName,
+                                    text: fileName,
+                                    style: 'display: block;',
+                                }).data('filename', other_file);
+
+                                const deleteBtn = $('<button>', {
+                                    text: 'x',
+                                    class: 'btn-file-delete',
+                                });
+
+                                // Thêm phần tử vào trong fileWrapper
+                                fileWrapper.append(fileElement).append(deleteBtn);
+
+                                // Thêm fileWrapper vào container
+                                otherFileContainer.append(fileWrapper);
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Có lỗi khi lấy danh sách file: ", error);
+                    }
+                });
+            }
         });
     </script>
 @endsection

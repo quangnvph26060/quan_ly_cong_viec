@@ -46,20 +46,19 @@ class ClientController extends Controller
     {
         // Validation cho các trường dữ liệu và ảnh
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
+            'name' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:15|unique:clients,phone',
             'email' => 'nullable|email',
             'company_name' => 'nullable|string|max:255',
             'tax_number' => 'nullable|string|max:255',
-            'address' => 'required|string',
+            'address' => 'nullable|string',
             'field' => 'nullable|string|max:255',
             'note' => 'nullable|string',
-            'front_id_image' => 'required|mimes:jpeg,jpg,png,gif|max:2048',
-            'back_id_image' => 'required|mimes:jpeg,jpg,png,gif|max:2048',
-            'other_images.*' => 'nullable|mimes:jpeg,jpg,png,gif|max:2048',
+            'front_id_image' => 'nullable|mimes:jpeg,jpg,png,gif|max:2048',
+            'back_id_image' => 'nullable|mimes:jpeg,jpg,png,gif|max:2048',
+            'other_images.*' => 'nullable|mimes:jpeg,jpg,png,gif,pdf',
         ], [
-            'front_id_image.required' => 'Ảnh mặt trước CMND là bắt buộc.',
-            'back_id_image.required' => 'Ảnh mặt sau CMND là bắt buộc.',
+            'phone.unique' => 'Số điện thoại đã tồn tại trong cơ sở dữ liệu',
             'front_id_image.mimes' => 'Chỉ chấp nhận file hình ảnh với định dạng: jpeg, jpg, png, gif.',
             'back_id_image.mimes' => 'Chỉ chấp nhận file hình ảnh với định dạng: jpeg, jpg, png, gif.',
             'front_id_image.max' => 'Kích thước ảnh mặt trước không được vượt quá 10MB.',
@@ -122,12 +121,12 @@ class ClientController extends Controller
         try {
             // Validate request data
             $validatedData = $request->validate([
-                'name' => 'required|string|max:255',
-                'phone' => 'required|string|max:20',
+                'name' => 'nullable|string|max:255',
+                'phone' => 'nullable|string|max:20',
                 'email' => 'nullable|email|max:255',
                 'company_name' => 'nullable|string|max:255',
                 'tax_number' => 'nullable|string|max:20',
-                'address' => 'required|string|max:255',
+                'address' => 'nullable|string|max:255',
                 'field' => 'nullable',
                 'note' => 'nullable',
             ]);

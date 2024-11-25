@@ -8,9 +8,6 @@
                     <th data-priority="3">Email</th>
                     <th data-priority="3">Số điện thoại</th>
                     <th data-priority="6">Tên công ty</th>
-                    <th>Mã số thuế</th>
-                    <th>Nguồn</th>
-                    <th>Ghi chú</th>
                     <th style="text-align: center" data-priority="7">Hành động</th>
                 </tr>
             </thead>
@@ -19,26 +16,12 @@
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td style="text-align: left;">
-                            <a href="#" class="client-name" data-id="{{ $client->id }}">{{ $client->name }}</a>
+                            <a href="#" class="client-name"
+                                data-id="{{ $client->id }}">{{ $client->name ?? '' }}</a>
                         </td>
-                        <td>{{ $client->email ?? 'Chưa có email' }} </td>
-                        <td>{{ $client->phone }}</td>
-                        <td>{{ $client->company_name ?? 'Chưa có tên công ty' }} </td>
-                        <td>{{ $client->tax_number ?? 'Chưa có mã số thuế' }}</td>
-                        <td>
-                            @switch($client->source)
-                                @case(0)
-                                    Thêm thủ công
-                                @break
-
-                                @case(1)
-                                    Link đăng ký miễn phí
-                                @break
-
-                                @default
-                            @endswitch
-                        </td>
-                        <td>{{ $client->note ?? '' }}</td>
+                        <td>{{ $client->email ?? '' }} </td>
+                        <td>{{ $client->phone ?? '' }}</td>
+                        <td>{{ $client->company_name ?? '' }} </td>
                         <td style="text-align: center">
                             <a href="javascript:void(0)" data-id="{{ $client->id }}"
                                 class="btn btn-warning open-edit-modal">Sửa</a>

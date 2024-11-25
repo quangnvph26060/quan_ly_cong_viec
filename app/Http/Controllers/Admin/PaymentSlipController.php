@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use App\Models\Client;
+use App\Models\PaymentSlip;
 use App\Services\Admins\ClientService;
 use App\Services\Admins\PaymentSlipService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -44,6 +45,28 @@ class PaymentSlipController extends Controller
         } catch (Exception $e) {
             Log::error("Failed to get paginated Payment Slip list: " . $e->getMessage());
             throw new Exception('Failed to get pagniated Payment Slip list');
+        }
+    }
+
+    public function edit($id)
+    {
+        try {
+            $paymentslip = PaymentSlip::find($id);
+            return view('admins.pages.paymentslip.edit', compact('paymentslip'));
+        } catch (Exception $e) {
+            Log::error('Failed to find this PaymentSlip: ' . $e->getMessage());
+            return ApiResponse::error('Failed to find this PaymentSlip', 500);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            $paymentslip = $this->paymentSlipService->updatePaymentSlip($request->all(), $id);
+            return redirect()->route('admin.paymentslip.index')->with('success', 'Sửa phiếu chi thành công');
+        } catch (Exception $e) {
+            Log::error('Failed to update this PaymentSlip: ' . $e->getMessage());
+            return ApiResponse::error('Failed to update this PaymentSlip', 500);
         }
     }
 
@@ -107,6 +130,7 @@ class PaymentSlipController extends Controller
             $query = $request->query('query');
             $clients = Client::where('name', 'LIKE', "%{$query}%")
                 ->orWhere('phone', 'LIKE', "%{$query}%")
+                ->orWhere('company_name', 'LIKE', "%{$query}%")
                 ->get();
             return response()->json(['success' => true, 'customers' => $clients]);
         } catch (Exception $e) {
