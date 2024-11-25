@@ -90,6 +90,27 @@ class PaymentSlipService
         }
     }
 
+    public function updatePaymentSlip(array $data, $id)
+    {
+        $paymentSlip = $this->getPaymentSlipById($id);
+        DB::beginTransaction();
+        $totalMoney = preg_replace('/[^\d]/', '', $data['amount']);
+        try {
+            $paymentSlip->update([
+                'amount' => $totalMoney,
+                'note' => $data['note'],
+                'client_id' => $data['client_id'],
+            ]);
+
+            DB::commit();
+            return $paymentSlip;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to update this paymentslip: ' . $e->getMessage());
+            throw new Exception('Failed to update this paymentslip');
+        }
+    }
+
     public function deletePaymentSlip($id)
     {
         DB::beginTransaction();

@@ -61,7 +61,7 @@
 
                                     <div class="col-lg-12 mt-5">
                                         <div class="mb-3">
-                                            <label for="other_images" class="form-label">Ảnh khác</label>
+                                            <label for="other_images" class="form-label">Tài liệu khác</label>
                                             <input type="file" class="form-control mb-3" id="other_images"
                                                 name="other_images[]" multiple>
                                             <div class="row" id="preview-other-images">
@@ -83,6 +83,20 @@
                                                                 src="{{ asset('images/no-image.jpg') }}" alt="Ảnh khác">
                                                         </a>
                                                     </div>
+                                                @endif
+                                            </div>
+                                            <div class="row" id="preview-other-files">
+                                                @if ($otherFiles)
+                                                    @foreach ($otherFiles as $otherFile)
+                                                        <div class="col-4 mb-3">
+                                                            <a href="/storage/{{ $otherFile }}"
+                                                                download="{{ basename($otherFile) }}">
+                                                                {{ basename($otherFile) }}
+                                                            </a>
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <div>Không có file</div>
                                                 @endif
                                             </div>
                                         </div>
@@ -133,23 +147,60 @@
             // Xử lý preview ảnh "other_images"
             document.getElementById('other_images').addEventListener('change', function() {
                 const files = this.files;
-                const previewContainer = document.getElementById('preview-other-images');
-                previewContainer.innerHTML = ''; // Xóa các ảnh đã preview
+                const previewImagesContainer = document.getElementById('preview-other-images');
+                const previewFilesContainer = document.getElementById('preview-other-files');
 
-                Array.from(files).forEach((file, index) => {
+                // Xóa danh sách ảnh và file PDF tương ứng
+                let hasImage = false;
+                let hasPDF = false;
+
+                Array.from(files).forEach((file) => {
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+                    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                        hasImage = true;
+                    } else if (fileExtension === 'pdf') {
+                        hasPDF = true;
+                    }
+                });
+
+                if (hasImage) {
+                    previewImagesContainer.innerHTML = ''; // Xóa danh sách ảnh cũ
+                }
+                if (hasPDF) {
+                    previewFilesContainer.innerHTML = ''; // Xóa danh sách file PDF cũ
+                }
+
+                Array.from(files).forEach((file) => {
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
                     const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.classList.add('img-fluid', 'image-thumbnail');
+
+                    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                        // Nếu là ảnh, hiển thị preview
+                        reader.onload = function(e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.classList.add('img-fluid', 'image-thumbnail');
+                            const colDiv = document.createElement('div');
+                            colDiv.classList.add('col-4', 'mb-3');
+                            colDiv.appendChild(img);
+                            previewImagesContainer.appendChild(colDiv);
+                        };
+                        reader.readAsDataURL(file);
+                    } else if (fileExtension === 'pdf') {
+                        // Nếu là file PDF, hiển thị tên file
                         const colDiv = document.createElement('div');
                         colDiv.classList.add('col-4', 'mb-3');
-                        colDiv.appendChild(img);
-                        previewContainer.appendChild(colDiv);
-                    };
-                    reader.readAsDataURL(file);
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(file);
+                        link.textContent = file.name;
+                        link.setAttribute('download', file.name); // Cho phép tải file PDF
+                        colDiv.appendChild(link);
+                        previewFilesContainer.appendChild(colDiv);
+                    }
                 });
             });
+
 
             // Xử lý AJAX form submit
             $('#update-client-image-form').on('submit', function(e) {

@@ -86,8 +86,8 @@
                     <div id="email-error" class="invalid-feedback"></div>
                 </div>
                 <div class="form-group">
-                    <label for="field" class="form-label">Ngành nghề <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="field" name="field" required>
+                    <label for="field" class="form-label">Ngành nghề</label>
+                    <input type="text" class="form-control" id="field" name="field">
                     <div id="field-error" class="invalid-feedback"></div>
                 </div>
                 <div class="form-group">
@@ -101,9 +101,14 @@
                     <div id="tax_number-error" class="invalid-feedback"></div>
                 </div>
                 <div class="form-group">
-                    <label for="address" class="form-label">Địa chỉ <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="address" name="address" required>
+                    <label for="address" class="form-label">Địa chỉ</label>
+                    <input type="text" class="form-control" id="address" name="address">
                     <div id="address-error" class="invalid-feedback"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="note" class="form-label">Ghi chú</label>
+                    <textarea class="form-control" id="note" name="note"></textarea>
+                    <div id="note-error" class="invalid-feedback"></div>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Xác nhận</button>
             </form>

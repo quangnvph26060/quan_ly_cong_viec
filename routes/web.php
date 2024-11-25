@@ -103,6 +103,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.', 'mi
         Route::post('storeByLink', [ClientController::class, 'storeByLink'])->name('storeByLink');
         Route::put('update-image/{id}', [ClientImageController::class, 'updateImage'])->name('updateImage');
         Route::get('edit-image/{id}', [ClientImageController::class, 'editImage'])->name('editImage');
+        Route::delete('delete-file/{id}', [ClientImageController::class, 'deleteFile'])->name('deleteFile');
     });
     Route::prefix('receipt')->name('receipt.')->group(function () {
         Route::get('', [ReceiptController::class, 'index'])->name('index');
@@ -113,6 +114,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.', 'mi
         Route::get('customer-search', [ReceiptController::class, 'searchCustomer'])->name('searchCustomer');
         Route::get('export-pdf/{id}', [ReceiptController::class, 'exportPDF'])->name('export_pdf');
         Route::delete('delete/{id}', [ReceiptController::class, 'delete'])->name('delete');
+        Route::get('detail/{id}', [ReceiptController::class, 'edit'])->name('detail');
+        Route::put('update/{id}', [ReceiptController::class, 'update'])->name('update');
     });
     Route::prefix('zalo')->name('zalo.')->group(function () {
         Route::prefix('oa')->name('oa.')->group(function () {
@@ -150,6 +153,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.', 'mi
         Route::get('customer-search', [PaymentSlipController::class, 'searchCustomer'])->name('searchCustomer');
         Route::get('export-pdf/{id}', [PaymentSlipController::class, 'exportPDF'])->name('export_pdf');
         Route::delete('delete/{id}', [PaymentSlipController::class, 'delete'])->name('delete');
+        Route::get('detail/{id}', [PaymentSlipController::class, 'edit'])->name('detail');
+        Route::put('update/{id}', [PaymentSlipController::class, 'update'])->name('update');
     });
     Route::get('/logout', 'DashboardController@logout')->name('logout');
     Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard')->middleware("role-admin");

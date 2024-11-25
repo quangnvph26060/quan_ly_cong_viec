@@ -111,21 +111,33 @@ class ClientService
             $frontIdImages = $this->saveImages($request, 'front_id_image', 'client_id_images');
             $backIdImages = $this->saveImages($request, 'back_id_image', 'client_id_images');
 
-            // Lưu ảnh "other_images"
             $otherImages = [];
+            $otherFiles = [];
+
             if ($request->hasFile('other_images')) {
-                foreach ($request->file('other_images') as $image) {
-                    // Lưu từng ảnh và thêm vào mảng
-                    $path = $image->store('client_other_images', 'public');
-                    $otherImages[] = $path;
+                foreach ($request->file('other_images') as $file) {
+                    //Lấy đuôi của file
+                    $extension = strtolower($file->getClientOriginalExtension());
+
+                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'jfif'])) {
+                        $imagename = $file->getClientOriginalName();
+                        $path = $file->storeAs('client_other_images', $imagename, 'public');
+                        $otherImages[] = $path;
+                    }
+
+                    if ($extension === 'pdf') {
+                        $fileName = $file->getClientOriginalName();
+                        $path = $file->storeAs('client_other_files', $fileName, 'public');
+                        $otherFiles[] = $path;
+                    }
                 }
             }
 
-            // Cập nhật lại thông tin ảnh vào khách hàng
             $client->update([
                 'front_id_image' => $frontIdImages ? implode(',', $frontIdImages) : null,
                 'back_id_image' => $backIdImages ? implode(',', $backIdImages) : null,
                 'other_images' => $otherImages ? json_encode($otherImages) : null,
+                'other_files' => $otherFiles ? json_encode($otherFiles) : null,
             ]);
 
             DB::commit();
@@ -186,6 +198,14 @@ class ClientService
                     }
                 }
             }
+            if ($client->other_files) {
+                $oldFiles = json_decode($client->other_files, true);
+                foreach ($oldFiles as $oldFile) {
+                    if (Storage::disk('public')->exists($oldFile)) {
+                        Storage::disk('public')->delete($oldFile);
+                    }
+                }
+            }
 
             $client->delete();
             DB::commit();
@@ -214,6 +234,37 @@ class ClientService
 
                 // Lưu file ảnh vào storage
                 $path = $image->storeAs($directory, $filename, 'public'); // Lưu vào thư mục public storage
+
+                // Lưu đường dẫn vào mảng
+                $paths[] = $path;
+            }
+
+            // Trả về danh sách các đường dẫn
+            return $paths;
+        }
+
+        // Trả về null nếu không có file nào được gửi
+        return null;
+    }
+    public function saveFiles($request, string $inputName, string $directory = 'files'): ?array
+    {
+        $paths = [];
+
+        // Kiểm tra xem có file không
+        if ($request->hasFile($inputName)) {
+            // Lấy tất cả các file
+            $files = $request->file($inputName);
+
+            if (!is_array($files)) {
+                $files = [$files]; // Đưa vào mảng nếu chỉ có 1 file
+            }
+
+            foreach ($files as $file) {
+                // Tạo tên file duy nhất
+                $filename = time() . uniqid() . '.' . $file->getClientOriginalExtension();
+
+                // Lưu file vào storage
+                $path = $file->storeAs($directory, $filename, 'public'); // Lưu vào thư mục public storage
 
                 // Lưu đường dẫn vào mảng
                 $paths[] = $path;

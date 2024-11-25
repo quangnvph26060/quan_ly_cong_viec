@@ -24,6 +24,7 @@ class Client extends Model
         'front_id_image',
         'back_id_image',
         'other_images',
+        'other_files',
     ];
 
     public function receipt()
