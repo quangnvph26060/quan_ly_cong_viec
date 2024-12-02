@@ -53,8 +53,8 @@
                 <form id="add-client-form">
                     @csrf
                     <div class="mb-3">
-                        <label for="name" class="form-label">Họ tên <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+                        <label for="name" class="form-label">Họ tên</label>
+                        <input type="text" class="form-control" id="name" name="name" >
                         <div id="name-error" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
@@ -65,7 +65,7 @@
                     <div class="mb-3">
                         <label for="phone" class="form-label">Số điện thoại <span
                                 class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="phone" name="phone" required>
+                        <input type="text" class="form-control" id="phone" name="phone" >
                         <div id="phone-error" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
@@ -84,7 +84,7 @@
                         <div id="tax_number-error" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="address" class="form-label">Địa chỉ <span class="text-danger">*</span></label>
+                        <label for="address" class="form-label">Địa chỉ</label>
                         <input type="text" class="form-control" id="address" name="address">
                         <div id="address-error" class="invalid-feedback"></div>
                     </div>
