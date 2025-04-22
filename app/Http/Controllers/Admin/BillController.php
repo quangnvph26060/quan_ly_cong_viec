@@ -104,7 +104,7 @@ class BillController extends Controller
     {
         try {
             $query = $request->query('query');
-            $clients = Client::where('name', 'like', "%{$query}%")->orWhere('phone', 'like', "%{$query}%")->get();
+            $clients = Client::where('name', 'like', "%{$query}%")->orWhere('phone', 'like', "%{$query}%")->orWhere('company_name', 'like', "%{$query}%")->get();
             return response()->json(['success' => true, 'customers' => $clients]);
         } catch (Exception $e) {
             Log::error("Failed to search clients: " . $e->getMessage());

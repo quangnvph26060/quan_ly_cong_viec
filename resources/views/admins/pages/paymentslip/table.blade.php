@@ -28,7 +28,11 @@
                         class="btn btn-success">
                         <i class="fas fa-file-pdf"></i> Xuất PDF
                     </a>
-                    <a href="javascript:void(0)" class="btn btn-danger btn-delete" data-url="{{ route('admin.paymentslip.delete', ['id' => $paymentslip->id]) }}">
+                    <a href="{{ route('admin.paymentslip.detail', ['id' => $paymentslip->id]) }}" class="btn btn-warning">
+                        <i class="fas fa-wrench"></i> Sửa
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-danger btn-delete"
+                        data-url="{{ route('admin.paymentslip.delete', ['id' => $paymentslip->id]) }}">
                         <i class="fas fa-trash"></i> Xóa
                     </a>
                 </td>

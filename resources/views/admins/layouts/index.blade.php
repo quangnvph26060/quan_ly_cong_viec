@@ -10,7 +10,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('libs/assets/images/favicon.ico') }}">
-
+    <link href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/css/lightbox.min.css" rel="stylesheet">
     <!-- plugin css -->
     <link href="{{ asset('libs/assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css') }}"
         rel="stylesheet" type="text/css" />
@@ -73,6 +73,7 @@
     <script src="{{ asset('libs/assets/libs/simplebar/simplebar.min.js') }}"></script>
     <script src="{{ asset('libs/assets/libs/node-waves/waves.min.js') }}"></script>
     <script src="{{ asset('libs/assets/libs/feather-icons/feather.min.js') }}"></script>
+
     <!-- pace js -->
     <script src="{{ asset('libs/assets/libs/pace-js/pace.min.js') }}"></script>
 

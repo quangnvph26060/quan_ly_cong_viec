@@ -129,76 +129,33 @@ class ReceiptService
                 'client_id' => $data['client_id'],
             ]);
 
-            // $accessToken = $this->zaloOaService->getAccessToken();
-            // $oa_id = ZaloOa::where('is_active', 1)->first()->id;
-
-            // try {
-            //     // Gửi yêu cầu tới API Zalo
-            //     $client = new GuzzleHttpClient();
-            //     $response = $client->post('https://business.openapi.zalo.me/message/template', [
-            //         'headers' => [
-            //             'access_token' => $accessToken,
-            //             'Content-Type' => 'application/json',
-            //         ],
-            //         'json' => [
-            //             'phone' => preg_replace('/^0/', '84', $receipt->client->phone),
-            //             'template_id' => '358801',
-            //             'template_data' => [
-            //                 'name' => $receipt->client->name,
-            //                 'order_code' => $receipt->id,
-            //                 'date' => Carbon::now()->format('d/m/y'), // Định dạng ngày tháng cụ thể
-            //                 'price' => $receipt->amount,
-            //                 'payment' => 'Chuyển khoản',
-            //                 'custom_field' => $receipt->note,
-            //                 'phone' => $receipt->client->phone,
-            //             ]
-            //         ]
-            //     ]);
-
-            //     $responseBody = $response->getBody()->getContents();
-            //     Log::info('API response: ' . $responseBody);
-
-            //     $responseData = json_decode($responseBody, true);
-            //     $status = $responseData['error'] == 0 ? 1 : 0;
-
-            //     $template_id = OaTemplate::where('template_id', '358801')->first()->id;
-
-            //     // Lưu thông tin vào cơ sở dữ liệu
-            //     ZnsMessage::create([
-            //         'name' => $receipt->client->name,
-            //         'phone' => $receipt->client->phone,
-            //         'sent_at' => Carbon::now(),
-            //         'status' => $status,
-            //         'note' => $responseData['message'],
-            //         'template_id' => $template_id,
-            //         'oa_id' => $oa_id,
-            //     ]);
-
-            //     if ($status == 1) {
-            //         Log::info('Gửi ZNS thành công');
-            //     } else {
-            //         Log::error('Gửi ZNS thất bại: ' . $response->getBody());
-            //     }
-            // } catch (Exception $e) {
-            //     Log::error('Lỗi khi gửi tin nhắn: ' . $e->getMessage());
-
-            //     // Lưu thông tin tin nhắn vào cơ sở dữ liệu khi gặp lỗi
-            //     ZnsMessage::create([
-            //         'name' => $receipt->client->name,
-            //         'phone' => $receipt->client->phone,
-            //         'sent_at' => Carbon::now(),
-            //         'status' => 0,
-            //         'note' => $e->getMessage(),
-            //         'oa_id' => $oa_id,
-            //     ]);
-            // }
-
             DB::commit();
             return $receipt;
         } catch (Exception $e) {
             DB::rollBack();
             Log::error("Failed to create new receipt:" . $e->getMessage());
             throw new Exception("Failed to create new receipt");
+        }
+    }
+
+    public function updateReceipt(array $data, $id)
+    {
+        $receipt = $this->getReceiptById($id);
+        DB::beginTransaction();
+        $totalMoney = preg_replace('/[^\d]/', '', $data['amount']);
+        try {
+            $receipt->update([
+                'amount' => $totalMoney,
+                'note' => $data['note'],
+                'client_id' => $data['client_id'],
+            ]);
+
+            DB::commit();
+            return $receipt;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error("Failed to update this receipt: " . $e->getMessage());
+            throw new Exception('Failed to update this receipt');
         }
     }
 

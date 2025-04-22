@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('dang-ky-mien-phi', [ClientController::class, 'addByLink'])->name('addByLink');
 Route::get("/thong-tin-du-an-seo", "CustomerController@customerForm")->name("customer-form");
 Route::post("/store-customer", "CustomerController@storeCustomer")->name("store-customer");
-Route::get("/admin/customer/list", "CustomerController@getListCustomer")->name("customer-list")->middleware("is-login-admin","role-admin");
+Route::get("/admin/customer/list", "CustomerController@getListCustomer")->name("customer-list")->middleware("is-login-admin", "role-admin");
 Route::get("/admin/customer/{id}/detail", "CustomerController@getDetailCustomer")->name("detail-customer")->middleware("is-login-admin");
 Route::get("/admin/customer/{id}/delete", "CustomerController@delete")->name("delete-customer")->middleware("is-login-admin");
 Route::get('/', 'AuthController@loginForm')->name('login');
@@ -55,7 +55,7 @@ Route::group(['prefix' => 'customer', 'namespace' => 'Customer', 'as' => 'custom
 
         return redirect()->route('login');
     })->name('logout');
-       Route::get('/', 'HomeController@index')->name('index')->middleware('auth');
+    Route::get('/', 'HomeController@index')->name('index')->middleware('auth');
     Route::post('/userinfo', 'HomeController@store')->name('store')->name('store');
     //Route::get('/attendance', 'AttendanceController@index')->name("attendance");
     Route::group(["prefix" => "attendance", "as" => "attendance."], function () {
@@ -91,6 +91,20 @@ Route::group(["prefix" => "news", "as" => "news."], function () {
 });
 
 Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.', 'middleware' => 'is-login-admin'], function () {
+    Route::prefix('client')->name('client.')->group(function () {
+        Route::delete('delete-image/{id}', [ClientImageController::class, 'deleteImage'])->name('deleteImage');
+        Route::get('', [ClientController::class, 'index'])->name('index');
+        Route::get('search', [ClientController::class, 'search'])->name('search');
+        Route::delete('delete/{id}', [ClientController::class, 'delete'])->name('delete');
+        Route::get('add', [ClientController::class, 'add'])->name('add');
+        Route::post('store', [ClientController::class, 'store'])->name('store');
+        Route::get('edit/{id}', [ClientController::class, 'edit'])->name('edit');
+        Route::put('update/{id}', [ClientController::class, 'update'])->name('update');
+        Route::post('storeByLink', [ClientController::class, 'storeByLink'])->name('storeByLink');
+        Route::put('update-image/{id}', [ClientImageController::class, 'updateImage'])->name('updateImage');
+        Route::get('edit-image/{id}', [ClientImageController::class, 'editImage'])->name('editImage');
+        Route::delete('delete-file/{id}', [ClientImageController::class, 'deleteFile'])->name('deleteFile');
+    });
     Route::prefix('receipt')->name('receipt.')->group(function () {
         Route::get('', [ReceiptController::class, 'index'])->name('index');
         Route::get('/client/{id}', [ReceiptController::class, 'showClientInfor'])->name('show');
@@ -100,6 +114,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.', 'mi
         Route::get('customer-search', [ReceiptController::class, 'searchCustomer'])->name('searchCustomer');
         Route::get('export-pdf/{id}', [ReceiptController::class, 'exportPDF'])->name('export_pdf');
         Route::delete('delete/{id}', [ReceiptController::class, 'delete'])->name('delete');
+        Route::get('detail/{id}', [ReceiptController::class, 'edit'])->name('detail');
+        Route::put('update/{id}', [ReceiptController::class, 'update'])->name('update');
     });
     Route::prefix('zalo')->name('zalo.')->group(function () {
         Route::prefix('oa')->name('oa.')->group(function () {
@@ -161,11 +177,13 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.', 'mi
         Route::get('customer-search', [PaymentSlipController::class, 'searchCustomer'])->name('searchCustomer');
         Route::get('export-pdf/{id}', [PaymentSlipController::class, 'exportPDF'])->name('export_pdf');
         Route::delete('delete/{id}', [PaymentSlipController::class, 'delete'])->name('delete');
+        Route::get('detail/{id}', [PaymentSlipController::class, 'edit'])->name('detail');
+        Route::put('update/{id}', [PaymentSlipController::class, 'update'])->name('update');
     });
     Route::get('/logout', 'DashboardController@logout')->name('logout');
     Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard')->middleware("role-admin");
 
-    Route::group(["prefix" => "check-in", "as" => "check-in.",'middleware' => 'role-admin'], function () {
+    Route::group(["prefix" => "check-in", "as" => "check-in.", 'middleware' => 'role-admin'], function () {
         Route::get("/", 'CheckInController@index')->name("index");
         Route::get("/pay-roll", 'CheckInController@getPayroll')->name("payroll");
     });
@@ -175,7 +193,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.', 'mi
         Route::post('/store-smtp', 'SettingController@storeSmtp')->name('store-smtp');
     });
 
-  Route::group(["prefix" => "fanpage", "as" => "fanpage.",'middleware' => 'role-admin'], function () {
+    Route::group(["prefix" => "fanpage", "as" => "fanpage.", 'middleware' => 'role-admin'], function () {
         Route::get("/list", "FanpageController@list")->name("list");
     });
 
@@ -214,7 +232,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.', 'mi
         Route::get("/{id}/delete", 'UserController@delete')->name("delete");
     });
 
-	Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => "role-admin"], function () {
+    Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => "role-admin"], function () {
         Route::get('/list', 'AdminController@list')->name('list');
         Route::get('/add', 'AdminController@add')->name('add');
         Route::post('/store', 'AdminController@store')->name('store');

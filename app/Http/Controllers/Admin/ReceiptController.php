@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Client;
+use App\Models\Receipt;
 use App\Services\Admins\ClientService;
 use App\Services\Admins\ReceiptService;
 use App\Services\Admins\ZaloOaService;
@@ -12,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Facade\FlareClient\Api;
 
 class ReceiptController extends Controller
 {
@@ -48,6 +51,28 @@ class ReceiptController extends Controller
         } catch (Exception $e) {
             Log::error('Failed to get paginated Receipt list: ' . $e->getMessage());
             throw new Exception('Failed to get paginated Receipt list');
+        }
+    }
+
+    public function edit($id)
+    {
+        try {
+            $receipt = Receipt::find($id);
+            return view('admins.pages.receipt.edit', compact('receipt'));
+        } catch (Exception $e) {
+            Log::error('Failed to find this receipt: ' . $e->getMessage());
+            return ApiResponse::error('Failed to find this receipt', 500);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            $receipt = $this->receiptService->updateReceipt($request->all(), $id);
+            return redirect()->route('admin.receipt.index')->with('success', 'Chỉnh sửa phiếu thu thành công');
+        } catch (Exception $e) {
+            Log::error("Failed to update this Receipt: " . $e->getMessage());
+            return ApiResponse::error("Failed to update this Receipt", 500);
         }
     }
 
@@ -113,6 +138,7 @@ class ReceiptController extends Controller
             $query = $request->query('query');
             $clients = Client::where('name', 'LIKE', "%{$query}%")
                 ->orWhere('phone', 'LIKE', "%{$query}%")
+                ->orWhere('company_name', 'LIKE', "%{$query}%")
                 ->get();
 
             return response()->json(['success' => true, 'customers' => $clients]);

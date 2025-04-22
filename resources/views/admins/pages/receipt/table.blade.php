@@ -27,8 +27,11 @@
                     <a href="{{ route('admin.receipt.export_pdf', ['id' => $receipt->id]) }}" class="btn btn-success">
                         <i class="fas fa-file-pdf"></i> Xuất PDF
                     </a>
+                    <a href="{{ route('admin.receipt.detail', ['id' => $receipt->id]) }}" class="btn btn-warning">
+                        <i class="fas fa-wrench"></i> Sửa
+                    </a>
                     <a href="javascript:void(0);" data-url="{{ route('admin.receipt.delete', ['id' => $receipt->id]) }}"
-                        class="btn btn-danger btn-delete">Xóa</a>
+                        class="btn btn-danger btn-delete"><i class="fas fa-trash">Xóa</i></a>
                 </td>
             </tr>
         @endforeach

@@ -84,9 +84,14 @@
                         <div id="tax_number-error" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="address" class="form-label">Địa chỉ <span class="text-danger">*</span></label>
+                        <label for="address" class="form-label">Địa chỉ</label>
                         <input type="text" class="form-control" id="address" name="address">
                         <div id="address-error" class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="note" class="form-label">Ghi chú</label>
+                        <textarea class="form-control" id="note" name="note"></textarea>
+                        <div id="note-error" class="invalid-feedback"></div>
                     </div>
                     <div class="modal-footer">
                         {{-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button> --}}

@@ -141,7 +141,7 @@
 
         </div> <!-- container-fluid -->
     </div>
-    <div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -193,7 +193,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 @endsection
 
 @section('scripts')
@@ -214,7 +214,8 @@
                         customerItem.setAttribute('data-email', customer.email);
                         customerItem.setAttribute('data-phone', customer.phone);
                         customerItem.setAttribute('data-address', customer.address);
-                        customerItem.textContent = `${customer.name} (${customer.phone})`;
+                        customerItem.textContent =
+                            `${customer.name} (${customer.phone}) - ${customer.company_name}`;
                         resultsList.appendChild(customerItem);
                     });
                     noResultsItem.style.display = 'none';
@@ -377,9 +378,9 @@
                     console.log(response);
                     if (response.success) {
                         $('#addClientModal').modal('hide');
-                        toastr.success(response.success, 'ThÃ nh cÃ´ng');
+                        toastr.success(response.success, 'Thành công');
                     } else if (response.error) {
-                        toastr.error(respons.error, 'Lá»—i');
+                        toastr.error(respons.error, 'Lỗi');
                     }
                 },
                 error: function(xhr) {

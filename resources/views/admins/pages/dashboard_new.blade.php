@@ -38,7 +38,7 @@
                             <div class="icon mb-3">
                                 <div class="row d-flex align-items-center">
                                     <div class="col-md-3 bg-primary p-3 rounded">
-                                      
+
                                         <i class="fas fa-user-minus text-white" style="font-size: 30px;"></i>
                                     </div>
                                     <div class="col-md-9">
@@ -73,7 +73,7 @@
                             <div class="icon mb-3">
                                 <div class="row d-flex align-items-center">
                                     <div class="col-md-3 bg-primary p-3 rounded">
-                    
+
                                         <i class="fas fa-user  text-white" style="font-size: 30px;"></i>
                                     </div>
                                     <div class="col-md-9">
@@ -87,7 +87,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            {{-- <div class="row">
                 <div class="col-lg-12">
                     <form method="GET">
                         <div class="row">
@@ -163,7 +163,7 @@
                         </div>
                     </div>
                 </div>
-            </div><!-- end row-->
+            </div><!-- end row--> --}}
         </div>
         <!-- container-fluid -->
     </div>
