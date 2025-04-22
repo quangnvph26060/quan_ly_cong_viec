@@ -21,6 +21,7 @@ class ClientController extends Controller
     public function index(Request $request)
     {
         try {
+          
             $clients = $this->clientService->getPaginatedClient();
 
             if ($request->ajax()) {

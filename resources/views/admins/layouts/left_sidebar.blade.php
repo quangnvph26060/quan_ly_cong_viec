@@ -197,6 +197,24 @@
                             <span data-key="t-apps">Quản lý báo giá</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow">
+                            <i data-feather="shopping-bag"></i>
+                            <span data-key="t-apps">Quản lý hoá đơn</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">
+                            <li>
+                                <a href="{{ route('admin.invoice.index') }}">
+                                    <span data-key="t-calendar">Hoá đơn mua vào</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('admin.invoice.indexSalesInvoice') }}">
+                                    <span data-key="t-chat">Hoá đơn bán vào</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     {{-- <li>
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="shopping-bag"></i>
