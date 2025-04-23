@@ -18,6 +18,7 @@ class Admin extends Authenticatable
         'role_code',
         'email',
         'password',
-        'status'
+        'status',
+        'level',
     ];
 }

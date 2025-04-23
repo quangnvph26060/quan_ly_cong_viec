@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\BillController;
 use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\ClientImageController;
 use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\OaTemplateController;
 use App\Http\Controllers\Admin\PaymentSlipController;
@@ -144,19 +145,11 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.', 'mi
         Route::put('update/{id}', [ClientController::class, 'update'])->name('update');
         Route::post('storeByLink', [ClientController::class, 'storeByLink'])->name('storeByLink');
     });
-    Route::prefix('invoice')->name('invoice.')->group(function (): void {
+    Route::prefix('invoice')->name('invoice.')->middleware('role-admin')->group(function (): void {
         Route::get('', [InvoiceController::class, 'index'])->name('index');
         Route::get('sales-invoice', [InvoiceController::class, 'indexSellerInvoice'])->name('indexSalesInvoice');
         Route::get('/invoice/export', [InvoiceController::class, 'export'])->name('invoice.export');
         Route::post('/invoice/import', [InvoiceController::class, 'import'])->name('invoice.import');
-
-        // Route::get('search', [ClientController::class, 'search'])->name('search');
-        // Route::delete('delete/{id}', [ClientController::class, 'delete'])->name('delete');
-        // Route::get('add', [ClientController::class, 'add'])->name('add');
-        // Route::post('store', [ClientController::class, 'store'])->name('store');
-        // Route::get('edit/{id}', [ClientController::class, 'edit'])->name('edit');
-        // Route::put('update/{id}', [ClientController::class, 'update'])->name('update');
-        // Route::post('storeByLink', [ClientController::class, 'storeByLink'])->name('storeByLink');
     });
     Route::prefix('bill')->name('bill.')->group(function () {
         Route::get('', [BillController::class, 'index'])->name('index');

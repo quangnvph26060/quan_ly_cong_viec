@@ -37,18 +37,29 @@ class AdminController extends Controller
     public function store(Request $request)
     {
         try {
-            $inputs = $request->except("_token");
-            $inputs["password"] = bcrypt($inputs["password"]);
-
-            $inputs["username"] = $inputs["full_name"];
-            $inputs["role_code"] = 'admin_mkt';
+            $validated = $request->validate([
+                'full_name' => 'required|string|max:255',
+                'password' => 'required|string|min:6',
+                'level' => 'required|in:1,3',
+            ]);
+            $inputs = [
+                'full_name'  => $validated['full_name'],
+                'username'   => $validated['full_name'],
+                'password'   => bcrypt($validated['password']),
+                'level'      => (int) $validated['level'],
+                'role_code'  => $validated['level'] == 3 ? 'QLHD' : 'admin_mkt',
+            ];
+    
             Admin::create($inputs);
-
-            return back()->with('success', 'Thêm thành công');
+    
+            return redirect()->back()->with('success', 'Thêm người dùng thành công!');
         } catch (\Throwable $th) {
-            $errorMessage = $th->getMessage();
-            \Log::info( 'Thêm thất bại. Lỗi: ' . $errorMessage);
-            return back()->with('error', 'Thêm thất bại');
+            \Log::error('Lỗi khi thêm người dùng: ' . $th->getMessage(), [
+                'trace' => $th->getTraceAsString(),
+                'input' => $request->all(),
+            ]);
+    
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi khi thêm người dùng. Vui lòng thử lại.');
         }
     }
     public function delete($userId)

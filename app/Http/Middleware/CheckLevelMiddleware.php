@@ -16,7 +16,8 @@ class CheckLevelMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (auth("admin")->user()->level == 2) {
+        if (auth('admin')->user()->role_code == 'admin')
+        {
             return $next($request);
         }
 

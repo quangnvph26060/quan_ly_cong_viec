@@ -28,14 +28,48 @@
                     <div class="card">
                         <div class="card-header">
                             <div class="row">
-                                <div class="col-lg-12">
+                                <div class="col-lg-2">
                                     <div class="form-group">
-                                        <label for="">Tìm kiếm</label>
+                                        <label for="">Mã số thuế</label>
                                         <input value="{{ request('query') }}" autocomplete="off" name="query"
-                                            placeholder="Nhập từ khóa tìm kiếm" type="text" class="form-control"
-                                            id="search-query">
+                                            placeholder="Mã số thuế" type="text" class="form-control"
+                                            id="mst">
                                     </div>
                                 </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label for="">Tên công ty</label>
+                                        <input value="{{ request('query') }}" autocomplete="off" name="query"
+                                            placeholder="Tên công ty" type="text" class="form-control"
+                                            id="tencongty">
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label for="">Từ ngày</label>
+                                        <input value="{{ request('query') }}" autocomplete="off" name="query"
+                                            placeholder="Nhập từ khóa tìm kiếm" type="date" class="form-control"
+                                            id="start_date">
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label for="">Đến ngày</label>
+                                        <input value="{{ request('query') }}" autocomplete="off" name="query"
+                                            placeholder="Nhập từ khóa tìm kiếm" type="date" class="form-control"
+                                            id="end_date">
+                                    </div>
+                                </div>
+                                {{-- <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <select name="year" id="year">
+                                            @foreach(range(1900, \Carbon\Carbon::now()->year) as $year)
+                                                <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                                            @endforeach
+                                        
+                                        </select>
+                                    </div>
+                                </div> --}}
                                 <div class="col-lg-12">
                                     <div class="form-group">
                                         <label for="" style="opacity: 0">1</label> <br>
@@ -48,10 +82,10 @@
                                         {{-- <button type="button" class="btn btn-success" id="open-add-modal">
                                             <i class="fas fa-plus"></i> Thêm mới
                                         </button> --}}
-                                        <form action="{{ route('admin.invoice.invoice.import', ['type' => 'purchase']) }}" method="POST" enctype="multipart/form-data" style="display: inline-block;">
+                                        <form id="import-form" action="{{ route('admin.invoice.invoice.import', ['type' => 'purchase']) }}" method="POST" enctype="multipart/form-data" style="display: inline-block;">
                                             @csrf
-                                            <input type="file" name="file" class="form-control d-inline" style="width: 200px;" required>
-                                            <button type="submit" class="btn btn-primary">Import</button>
+                                            <input type="file" id="file-input-import" name="file" class="d-none">
+                                            <button type="button" class="btn btn-primary" onclick="triggerFileImport()">Import</button>
                                         </form>
                                         <a href="{{ route('admin.invoice.invoice.export', ['type' => 'purchase']) }}" class="btn btn-success">Export</a>
                                     </div>
@@ -81,6 +115,19 @@
 @section('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        function triggerFileImport() {
+            document.getElementById('file-input-import').click();
+        }
+    
+        document.getElementById('file-input-import').addEventListener('change', function () {
+            if (this.files.length > 0) {
+                document.getElementById('import-form').submit();
+            } else {
+                alert("Vui lòng chọn file để import.");
+            }
+        });
+    </script>
     <script>
         $(document).ready(function() {
             const csrfToken = $('meta[name="csrf-token"]').attr('content');
@@ -149,11 +196,14 @@
             });
 
 
-            // Tìm kiếm khách hàng
             $('#search-btn').on('click', function() {
-                updateTableAndPagination();
+                let mst        = $('#mst').val();
+                let tencongty  = $('#tencongty').val();
+                let start_date = $('#start_date').val();
+                let end_date   = $('#end_date').val();
+              
+                updateTableAndPagination(mst, tencongty, start_date, end_date );
             });
-
             $('#search-query').on('keydown', function(e) {
                 if (e.key === 'Enter') {
                     updateTableAndPagination();
@@ -206,13 +256,15 @@
             });
 
             // Cập nhật bảng khách hàng và phân trang
-            function updateTableAndPagination() {
-                let query = $('#search-query').val();
+            function updateTableAndPagination(mst, tencongty, start_date, end_date ) {
                 $.ajax({
-                    url: "{{ route('admin.client.search') }}",
+                    url: "{{ route('admin.invoice.index') }}",
                     type: 'GET',
                     data: {
-                        query: query
+                        mst: mst,
+                        tencongty: tencongty,
+                        start_date: start_date,
+                        end_date:   end_date,
                     },
                     success: function(response) {
                         $('#table-content').html(response.html);

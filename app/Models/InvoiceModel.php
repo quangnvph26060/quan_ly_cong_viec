@@ -9,6 +9,7 @@ class InvoiceModel extends Model
     protected $table = 'invoices';
 
     protected $fillable = [
+        'denominator_symbol',
         'seller_tax_code',
         'seller_name',
         'seller_address',
@@ -28,7 +29,7 @@ class InvoiceModel extends Model
     ];
 
     protected $casts = [
-        'invoice_date' => 'datetime',
+        'invoice_date' => 'date',
         'total_before_tax' => 'float',
         'total_tax' => 'float',
         'total_discount' => 'float',

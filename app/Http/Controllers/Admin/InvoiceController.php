@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Imports\PurchaseInvoicesImport;
 use App\Imports\SalesInvoicesImport;
 use App\Models\InvoiceModel;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -20,9 +21,32 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         try {
-          
-            $clients =  InvoiceModel::orderByDesc('created_at')->where('status',0)->paginate(10);
+            $start_date = $request->start_date;
+            $end_date   = $request->end_date;
+            $mst        = $request->mst;
+            $tencongty  = $request->tencongty;
 
+            $clients = InvoiceModel::query()
+                ->when($mst, function ($query, $mst) {
+                    $query->where('seller_tax_code', 'like', "%$mst%");
+                })
+                ->when($tencongty, function ($query, $tencongty) {
+                    $query->where('seller_name', 'like', "%$tencongty%");
+                })
+                ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
+                    try {
+                        $start = Carbon::parse($start_date)->startOfDay(); 
+                        $end = Carbon::parse($end_date)->endOfDay();
+                        $query->whereBetween('invoice_date', [$start, $end]);
+                    } catch (\Exception $e) {
+                        \Log::error("Invalid date format: $start_date - $end_date");
+                    }
+                })
+                
+                ->where('status', 0)
+                ->orderByDesc('created_at')
+                ->paginate(10);
+                
             if ($request->ajax()) {
                 return response()->json([
                     'html' => view('admins.pages.purchase_invoice.table', compact('clients'))->render(),
@@ -37,10 +61,32 @@ class InvoiceController extends Controller
         }
     }
     public function indexSellerInvoice(Request $request)
-    {
+    { 
         try {
-          
-            $clients =  InvoiceModel::orderByDesc('created_at')->where('status',1)->paginate(10);
+            $start_date = $request->start_date;
+            $end_date   = $request->end_date;
+            $mst        = $request->mst;
+            $tencongty  = $request->tencongty;
+            $clients = InvoiceModel::query()
+                ->when($mst, function ($query, $mst) {
+                    $query->where('seller_tax_code', 'like', "%$mst%");
+                })
+                ->when($tencongty, function ($query, $tencongty) {
+                    $query->where('seller_name', 'like', "%$tencongty%");
+                })
+                ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
+                    try {
+                        $start = Carbon::parse($start_date)->startOfDay();
+                        $end = Carbon::parse($end_date)->endOfDay();
+                        $query->whereBetween('invoice_date', [$start, $end]);
+                    } catch (\Exception $e) {
+                        \Log::error("Invalid date format: $start_date - $end_date");
+                    }
+                })
+                
+                ->where('status', 1)
+                ->orderByDesc('created_at')
+                ->paginate(10);
 
             if ($request->ajax()) {
                 return response()->json([
@@ -53,6 +99,29 @@ class InvoiceController extends Controller
         } catch (Exception $e) {
             Log::error('Failed to get paginated Client list: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to get paginated Client list'], 500);
+        }
+    }
+    public function search(Request $request)
+    {
+        try {
+            $query = $request->input('query');
+
+            // Xử lý tìm kiếm theo tên hoặc số điện thoại
+            if (preg_match('/\d/', $query)) {
+              //  $clients = $this->clientService->getClientByPhone($query);
+            } else {
+              //  $clients = $this->clientService->getClientByName($query);
+            }
+
+            if ($request->ajax()) {
+                $html = view('admins.pages.client.table', compact('clients'))->render();
+                $pagination = $clients->appends(['query' => $query])->links('pagination::bootstrap-4')->render();
+                return response()->json(['html' => $html, 'pagination' => $pagination]);
+            }
+            return view('admins.pages.sales_invoice.index', compact('clients'));
+        } catch (Exception $e) {
+            Log::error('Failed to search clients: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to search clients'], 500);
         }
     }
     public function export(Request $request)
@@ -75,7 +144,7 @@ class InvoiceController extends Controller
         $request->validate([
             'file' => 'required|mimes:xlsx,xls'
         ]);
-
+        Log::info($type);
         if ($type === 'purchase') {
             Excel::import(new PurchaseInvoicesImport, $request->file('file'));
         } elseif ($type === 'sales') {

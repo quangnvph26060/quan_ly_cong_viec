@@ -124,7 +124,7 @@
                                         <select required class="form-select" name="level" id="example-select">
                                          
                                             <option value="1">Admin MKT</option>
-                                          
+                                            <option value="3">Quản lý hoá đơn</option>
                                         </select>
                                         @error('level')
                                             <div class="invalid-feedback d-block">

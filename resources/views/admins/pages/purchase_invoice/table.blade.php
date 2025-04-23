@@ -6,7 +6,7 @@
                     <th>STT</th>
                     <th data-priority="2">Số hoá đơn</th>
                     <th data-priority="3">Ngày lập</th>
-                    <th data-priority="3">MST</th>
+                    <th data-priority="3">Mã số thuế</th>
                     <th data-priority="6">Tên công ty</th>
                     <th>Tổng tiền chưa thuế </th>
                     <th>Tổng tiền thuế </th>
@@ -24,7 +24,7 @@
                         <td style="text-align: left;">
                             <a href="#" class="invoice_number">{{ $client->invoice_number }}</a>
                         </td>
-                        <td>{{ $client->invoice_date }} </td>
+                        <td> {{ \Carbon\Carbon::parse($client->invoice_date)->format('d/m/Y') }}</td>
                         <td>{{ $client->seller_tax_code }}</td>
                         <td>{{ $client->seller_name }} </td>
                         <td>{{ number_format($client->total_before_tax) }}</td>
