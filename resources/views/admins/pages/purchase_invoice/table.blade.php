@@ -1,3 +1,22 @@
+<div class="row">
+    <div class="col-md-5">
+
+    </div>
+    <div class="col-md-7 d-flex" style="gap:53px">
+        <div class="d-flex">
+            <p class="fw-bold">Tổng tiền chưa thuế: </p>
+            <p>{{ number_format($sumBeforeTax) }}</p>
+        </div>
+        <div class="d-flex">
+            <p class="fw-bold">Tổng tiền thuế: </p>
+            <p>{{ number_format($sumTax) }}</p>
+        </div>
+        <div class="d-flex">
+            <p class="fw-bold">Tổng tiền thành toán :</p>
+            <p>{{ number_format($sumPayment) }}</p>
+        </div>
+    </div>
+</div>
 <div class="table-rep-plugin">
     <div class="table-responsive mb-0" data-pattern="priority-columns">
         <table id="tech-companies-1" class="table table-striped">

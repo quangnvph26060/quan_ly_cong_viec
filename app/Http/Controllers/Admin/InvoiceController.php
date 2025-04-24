@@ -46,15 +46,17 @@ class InvoiceController extends Controller
                 ->where('status', 0)
                 ->orderByDesc('created_at')
                 ->paginate(10);
-                
+                $sumBeforeTax = InvoiceModel::where('status', 0)->sum('total_before_tax');
+                $sumTax = InvoiceModel::where('status', 0)->sum('total_tax');
+                $sumPayment = InvoiceModel::where('status', 0)->sum('total_payment');
             if ($request->ajax()) {
                 return response()->json([
-                    'html' => view('admins.pages.purchase_invoice.table', compact('clients'))->render(),
+                    'html' => view('admins.pages.purchase_invoice.table', compact('clients','sumBeforeTax','sumTax','sumPayment'))->render(),
                     'pagination' => $clients->links('pagination::bootstrap-4')->toHtml()
                 ]);
             }
 
-            return view('admins.pages.purchase_invoice.index', compact('clients'));
+            return view('admins.pages.purchase_invoice.index', compact('clients','sumBeforeTax','sumTax','sumPayment'));
         } catch (Exception $e) {
             Log::error('Failed to get paginated Client list: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to get paginated Client list'], 500);
@@ -87,15 +89,17 @@ class InvoiceController extends Controller
                 ->where('status', 1)
                 ->orderByDesc('created_at')
                 ->paginate(10);
-
+                $sumBeforeTax = InvoiceModel::where('status', 0)->sum('total_before_tax');
+                $sumTax = InvoiceModel::where('status', 0)->sum('total_tax');
+                $sumPayment = InvoiceModel::where('status', 0)->sum('total_payment');
             if ($request->ajax()) {
                 return response()->json([
-                    'html' => view('admins.pages.sales_invoice.table', compact('clients'))->render(),
+                    'html' => view('admins.pages.sales_invoice.table', compact('clients','sumBeforeTax','sumTax','sumPayment'))->render(),
                     'pagination' => $clients->links('pagination::bootstrap-4')->toHtml()
                 ]);
             }
 
-            return view('admins.pages.sales_invoice.index', compact('clients'));
+            return view('admins.pages.sales_invoice.index', compact('clients','sumBeforeTax','sumTax','sumPayment'));
         } catch (Exception $e) {
             Log::error('Failed to get paginated Client list: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to get paginated Client list'], 500);
