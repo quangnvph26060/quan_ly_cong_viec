@@ -1,6 +1,6 @@
 <div class="row">
-    <div class="col-md-5">
-
+    <div class="col-md-5 d-flex     align-items-center" style="gap: 5px">
+        <input type="checkbox" class="check_all">   <span class="btn-remove-all" style="cursor: pointer;">Xoá</span>
     </div>
     <div class="col-md-7 d-flex" style="gap:53px">
         <div class="d-flex">
@@ -16,12 +16,14 @@
             <p>{{ number_format($sumPayment) }}</p>
         </div>
     </div>
+
 </div>
 <div class="table-rep-plugin">
     <div class="table-responsive mb-0" data-pattern="priority-columns">
-        <table id="tech-companies-1" class="table table-striped">
+        <table id="tech-companies-1 " class="table table-striped">
             <thead>
                 <tr>
+                    <th></th>
                     <th>STT</th>
                     <th data-priority="2">Số hoá đơn</th>
                     <th data-priority="3">Ngày lập</th>
@@ -39,6 +41,9 @@
                 @endphp
                 @foreach ($clients as $key => $client)
                     <tr>
+                        <td>
+                            <input type="checkbox"  class="check_item" data-id="{{$client->id}}">
+                        </td>
                         <td>{{ $key + $start }}</td>
                         <td style="text-align: left;">
                             <a href="#" class="invoice_number">{{ $client->invoice_number }}</a>
@@ -51,10 +56,10 @@
                         <td>{{ number_format($client->total_payment) }}</td>
 
                         <td style="text-align: center">
-                            <a href="javascript:void(0)" data-id="{{ $client->id }}"
-                                class="btn btn-warning open-edit-modal">Sửa</a>
-                            <a href="#" data-url="{{ route('admin.client.delete', ['id' => $client->id]) }}"
-                                class="btn btn-danger btn-delete">Xóa</a>
+                            <form action="{{ route('admin.invoice.invoice.delete', ['id' => $client->id]) }}" method="POST"  class="form-delete">
+                                @csrf
+                                <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach
@@ -62,3 +67,16 @@
         </table>
     </div>
 </div>
+<style scoped>
+    .btn-remove-all {
+        color: inherit; /* Giữ màu ban đầu */
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-remove-all:hover {
+        color: red;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+</style>

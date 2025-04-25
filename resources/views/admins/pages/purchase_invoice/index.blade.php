@@ -32,16 +32,14 @@
                                     <div class="form-group">
                                         <label for="">Mã số thuế</label>
                                         <input value="{{ request('query') }}" autocomplete="off" name="query"
-                                            placeholder="Mã số thuế" type="text" class="form-control"
-                                            id="mst">
+                                            placeholder="Mã số thuế" type="text" class="form-control" id="mst">
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-group">
                                         <label for="">Tên công ty</label>
                                         <input value="{{ request('query') }}" autocomplete="off" name="query"
-                                            placeholder="Tên công ty" type="text" class="form-control"
-                                            id="tencongty">
+                                            placeholder="Tên công ty" type="text" class="form-control" id="tencongty">
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -63,7 +61,7 @@
                                 {{-- <div class="col-lg-2">
                                     <div class="form-group">
                                         <select name="year" id="year">
-                                            @foreach(range(1900, \Carbon\Carbon::now()->year) as $year)
+                                            @foreach (range(1900, \Carbon\Carbon::now()->year) as $year)
                                                 <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>{{ $year }}</option>
                                             @endforeach
                                         
@@ -82,12 +80,16 @@
                                         {{-- <button type="button" class="btn btn-success" id="open-add-modal">
                                             <i class="fas fa-plus"></i> Thêm mới
                                         </button> --}}
-                                        <form id="import-form" action="{{ route('admin.invoice.invoice.import', ['type' => 'purchase']) }}" method="POST" enctype="multipart/form-data" style="display: inline-block;">
+                                        <form id="import-form"
+                                            action="{{ route('admin.invoice.invoice.import', ['type' => 'purchase']) }}"
+                                            method="POST" enctype="multipart/form-data" style="display: inline-block;">
                                             @csrf
                                             <input type="file" id="file-input-import" name="file" class="d-none">
-                                            <button type="button" class="btn btn-primary" onclick="triggerFileImport()">Import</button>
+                                            <button type="button" class="btn btn-primary"
+                                                onclick="triggerFileImport()">Import</button>
                                         </form>
-                                        <a href="{{ route('admin.invoice.invoice.export', ['type' => 'purchase']) }}" class="btn btn-success">Export</a>
+                                        <a href="{{ route('admin.invoice.invoice.export', ['type' => 'purchase']) }}"
+                                            class="btn btn-success">Export</a>
                                     </div>
                                 </div>
                             </div>
@@ -109,7 +111,6 @@
 
         </div> <!-- container-fluid -->
     </div>
-
 @endsection
 
 @section('scripts')
@@ -119,8 +120,8 @@
         function triggerFileImport() {
             document.getElementById('file-input-import').click();
         }
-    
-        document.getElementById('file-input-import').addEventListener('change', function () {
+
+        document.getElementById('file-input-import').addEventListener('change', function() {
             if (this.files.length > 0) {
                 document.getElementById('import-form').submit();
             } else {
@@ -164,7 +165,46 @@
                     }
                 });
             });
+            // Khi click vào checkbox "Chọn tất cả"
+            $(document).on('click', '.check_all', function() {
+                let isChecked = $(this).is(':checked');
+                $('.check_item').prop('checked', isChecked);
+                let selectedIds = [];
+                $('.check_item:checked').each(function() {
+                    selectedIds.push($(this).data('id'));
+                });
+            });
+            $(document).on('click', '.btn-remove-all', function() {
+                let selectedIds = [];
+                $('.check_item:checked').each(function() {
+                    selectedIds.push($(this).data('id'));
+                });
+                if (selectedIds.length === 0) {
+                    alert("Vui lòng chọn ít nhất một mục để xoá.");
+                    return;
+                }
+                // ajax
+                $.ajax({
+                    url: "{{ route('admin.invoice.invoice.delete.all') }}",
+                    type: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        data: selectedIds,
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
 
+                            updateTableAndPagination();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Lỗi Ajax:', xhr.responseText);
+                        console.log('Lỗi status:', status);
+                        console.log('Lỗi chi tiết:', error);
+                    }
+                });
+
+            });
             $('#edit-client-form').on('submit', function(e) {
                 e.preventDefault();
                 let clientId = $('#edit-client-id').val();
@@ -197,12 +237,12 @@
 
 
             $('#search-btn').on('click', function() {
-                let mst        = $('#mst').val();
-                let tencongty  = $('#tencongty').val();
+                let mst = $('#mst').val();
+                let tencongty = $('#tencongty').val();
                 let start_date = $('#start_date').val();
-                let end_date   = $('#end_date').val();
-              
-                updateTableAndPagination(mst, tencongty, start_date, end_date );
+                let end_date = $('#end_date').val();
+
+                updateTableAndPagination(mst, tencongty, start_date, end_date);
             });
             $('#search-query').on('keydown', function(e) {
                 if (e.key === 'Enter') {
@@ -256,7 +296,7 @@
             });
 
             // Cập nhật bảng khách hàng và phân trang
-            function updateTableAndPagination(mst, tencongty, start_date, end_date ) {
+            function updateTableAndPagination(mst, tencongty, start_date, end_date) {
                 $.ajax({
                     url: "{{ route('admin.invoice.index') }}",
                     type: 'GET',
@@ -264,7 +304,7 @@
                         mst: mst,
                         tencongty: tencongty,
                         start_date: start_date,
-                        end_date:   end_date,
+                        end_date: end_date,
                     },
                     success: function(response) {
                         $('#table-content').html(response.html);

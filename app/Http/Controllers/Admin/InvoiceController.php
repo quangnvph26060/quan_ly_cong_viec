@@ -38,13 +38,13 @@ class InvoiceController extends Controller
                         $start = Carbon::parse($start_date)->startOfDay(); 
                         $end = Carbon::parse($end_date)->endOfDay();
                         $query->whereBetween('invoice_date', [$start, $end]);
-                    } catch (\Exception $e) {
-                        \Log::error("Invalid date format: $start_date - $end_date");
+                    } catch (Exception $e) {
+                        Log::error("Invalid date format: $start_date - $end_date");
                     }
                 })
                 
                 ->where('status', 0)
-                ->orderByDesc('created_at')
+                ->orderByDesc('invoice_date')
                 ->paginate(10);
                 $sumBeforeTax = InvoiceModel::where('status', 0)->sum('total_before_tax');
                 $sumTax = InvoiceModel::where('status', 0)->sum('total_tax');
@@ -81,17 +81,17 @@ class InvoiceController extends Controller
                         $start = Carbon::parse($start_date)->startOfDay();
                         $end = Carbon::parse($end_date)->endOfDay();
                         $query->whereBetween('invoice_date', [$start, $end]);
-                    } catch (\Exception $e) {
-                        \Log::error("Invalid date format: $start_date - $end_date");
+                    } catch (Exception $e) {
+                        Log::error("Invalid date format: $start_date - $end_date");
                     }
                 })
                 
                 ->where('status', 1)
-                ->orderByDesc('created_at')
+                ->orderByDesc('invoice_date')
                 ->paginate(10);
-                $sumBeforeTax = InvoiceModel::where('status', 0)->sum('total_before_tax');
-                $sumTax = InvoiceModel::where('status', 0)->sum('total_tax');
-                $sumPayment = InvoiceModel::where('status', 0)->sum('total_payment');
+                $sumBeforeTax = InvoiceModel::where('status', 1)->sum('total_before_tax');
+                $sumTax = InvoiceModel::where('status', 1)->sum('total_tax');
+                $sumPayment = InvoiceModel::where('status', 1)->sum('total_payment');
             if ($request->ajax()) {
                 return response()->json([
                     'html' => view('admins.pages.sales_invoice.table', compact('clients','sumBeforeTax','sumTax','sumPayment'))->render(),
@@ -159,4 +159,28 @@ class InvoiceController extends Controller
 
         return back()->with('success', 'Import thành công!');
     }
+    public function deleteInvoice($id){
+        if (!$id) {
+            return redirect()->back()->with('error', 'Không tìm thấy dữ liệu');
+        }
+    
+        $deleteInvoice = InvoiceModel::find($id);
+        if (!$deleteInvoice) {
+            return redirect()->back()->with('error', 'Không tìm thấy hoá đơn');
+        }
+    
+        $deleteInvoice->delete();
+        return back()->with('success', 'Xoá thành công');
+    }
+    public function deleteInvoiceAll(Request $request) {
+        $ids = $request->data;
+    
+        if (empty($ids)) {
+            return response()->json(['message' => 'Không có dữ liệu để xoá'], 400);
+        }
+        InvoiceModel::whereIn('id', $ids)->delete();
+    
+        return response()->json(['status'=>'success','message' => 'Xoá thành công']);
+    }
+    
 }

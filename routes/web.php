@@ -150,6 +150,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.', 'mi
         Route::get('sales-invoice', [InvoiceController::class, 'indexSellerInvoice'])->name('indexSalesInvoice');
         Route::get('/invoice/export', [InvoiceController::class, 'export'])->name('invoice.export');
         Route::post('/invoice/import', [InvoiceController::class, 'import'])->name('invoice.import');
+        Route::post('delete/{id}', [InvoiceController::class, 'deleteInvoice'])->name('invoice.delete');
+        Route::get('delete/all', [InvoiceController::class, 'deleteInvoiceAll'])->name('invoice.delete.all');
     });
     Route::prefix('bill')->name('bill.')->group(function () {
         Route::get('', [BillController::class, 'index'])->name('index');
