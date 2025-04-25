@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class SalesInvoicesImport implements ToCollection, WithHeadingRow
 {
+    // hoá đơn bán ra 
     public function headingRow(): int
     {
         return 6; // Dòng tiêu đề trong Excel
@@ -40,9 +41,9 @@ class SalesInvoicesImport implements ToCollection, WithHeadingRow
                     'invoice_symbol'       => $row['ky_hieu_hoa_don'] ?? null,
                     'invoice_number'       => $row['so_hoa_don'] ?? null,
                     'invoice_date'         => $this->parseDate($row['ngay_lap']),
-                    'seller_tax_code'      => $row['mst_nguoi_banmst_nguoi_xuat_hang'] ?? null,
-                    'seller_name'          => $row['ten_nguoi_banten_nguoi_xuat_hang'] ?? null,
-                    'seller_address'       => $row['dia_chi_nguoi_ban'] ?? null,
+                    'seller_tax_code'      => $row['mst_nguoi_muamst_nguoi_nhan_hang'] ?? null,
+                    'seller_name'          => $row['ten_nguoi_muaten_nguoi_nhan_hang'] ?? null,
+                    'seller_address'       => $row['dia_chi_nguoi_mua'] ?? null,
                     'total_before_tax'     => $row['tong_tien_chua_thue'] ?? null,
                     'total_tax'            => $row['tong_tien_thue'] ?? null,
                     'total_discount'       => $row['tong_tien_chiet_khau_thuong_mai'] ?? null,

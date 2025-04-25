@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class PurchaseInvoicesImport implements ToCollection, WithHeadingRow
 {
+    // hoá đơn mua vào 
 
     public function headingRow(): int
     {
