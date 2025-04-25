@@ -44,6 +44,17 @@
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-group">
+                                        <label for="">Tiền thuế</label>
+                                        <select class="form-control" id="tax">
+                                            <option value="">--Chọn--</option>
+                                            <option value="0">Có thuế</option> 
+                                            <option value="1">Không có thuế</option>        
+                                          </select>
+                                     
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
                                         <label for="">Từ ngày</label>
                                         <input value="{{ request('query') }}" autocomplete="off" name="query"
                                             placeholder="Nhập từ khóa tìm kiếm" type="date" class="form-control"
@@ -237,12 +248,14 @@
 
 
             $('#search-btn').on('click', function() {
-                let mst = $('#mst').val();
-                let tencongty = $('#tencongty').val();
+                let mst        = $('#mst').val();
+                let tencongty  = $('#tencongty').val();
                 let start_date = $('#start_date').val();
-                let end_date = $('#end_date').val();
-
-                updateTableAndPagination(mst, tencongty, start_date, end_date);
+                let end_date   = $('#end_date').val();
+                let tax        = $('#tax').val();
+                console.log(tax);
+                
+                updateTableAndPagination(mst, tencongty, start_date, end_date, tax);
             });
             $('#search-query').on('keydown', function(e) {
                 if (e.key === 'Enter') {
@@ -296,7 +309,7 @@
             });
 
             // Cập nhật bảng khách hàng và phân trang
-            function updateTableAndPagination(mst, tencongty, start_date, end_date) {
+            function updateTableAndPagination(mst, tencongty, start_date, end_date, tax) {
                 $.ajax({
                     url: "{{ route('admin.invoice.index') }}",
                     type: 'GET',
@@ -305,6 +318,7 @@
                         tencongty: tencongty,
                         start_date: start_date,
                         end_date: end_date,
+                        tax: tax,
                     },
                     success: function(response) {
                         $('#table-content').html(response.html);

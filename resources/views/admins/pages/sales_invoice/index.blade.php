@@ -45,6 +45,17 @@
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-group">
+                                        <label for="">Tiền thuế</label>
+                                        <select class="form-control" id="tax">
+                                            <option value="">--Chọn--</option>
+                                            <option value="0">Có thuế</option> 
+                                            <option value="1">Không có thuế</option>        
+                                          </select>
+                                     
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
                                         <label for="">Từ ngày</label>
                                         <input value="{{ request('query') }}" autocomplete="off" name="query"
                                             placeholder="Nhập từ khóa tìm kiếm" type="date" class="form-control"
@@ -198,8 +209,8 @@
                 let tencongty = $('#tencongty').val();
                 let start_date = $('#start_date').val();
                 let end_date = $('#end_date').val();
-
-                updateTableAndPagination(mst, tencongty, start_date, end_date);
+                let tax = $('#tax').val();
+                updateTableAndPagination(mst, tencongty, start_date, end_date, tax);
             });
 
             $('#search-query').on('keydown', function(e) {
@@ -295,7 +306,7 @@
             });
 
             // Cập nhật bảng khách hàng và phân trang
-            function updateTableAndPagination(mst, tencongty, start_date, end_date) {
+            function updateTableAndPagination(mst, tencongty, start_date, end_date, tax) {
                 let query = $('#search-query').val();
                 $.ajax({
                     url: "{{ route('admin.invoice.indexSalesInvoice') }}",
@@ -305,6 +316,7 @@
                         tencongty: tencongty,
                         start_date: start_date,
                         end_date: end_date,
+                        tax: tax,
                     },
                     success: function(response) {
                         $('#table-content').html(response.html);

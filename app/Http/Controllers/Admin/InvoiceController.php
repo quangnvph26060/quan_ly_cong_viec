@@ -16,8 +16,8 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class InvoiceController extends Controller
 {
-  
-    
+
+
     public function index(Request $request)
     {
         try {
@@ -25,7 +25,7 @@ class InvoiceController extends Controller
             $end_date   = $request->end_date;
             $mst        = $request->mst;
             $tencongty  = $request->tencongty;
-
+            $tax        = $request->tax;
             $clients = InvoiceModel::query()
                 ->when($mst, function ($query, $mst) {
                     $query->where('seller_tax_code', 'like', "%$mst%");
@@ -33,48 +33,12 @@ class InvoiceController extends Controller
                 ->when($tencongty, function ($query, $tencongty) {
                     $query->where('seller_name', 'like', "%$tencongty%");
                 })
-                ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
-                    try {
-                        $start = Carbon::parse($start_date)->startOfDay(); 
-                        $end = Carbon::parse($end_date)->endOfDay();
-                        $query->whereBetween('invoice_date', [$start, $end]);
-                    } catch (Exception $e) {
-                        Log::error("Invalid date format: $start_date - $end_date");
+                ->when($tax !== null, function ($query) use ($tax) {
+                    if ($tax == 0) {
+                        $query->where('total_tax', '>', 0);
+                    } elseif ($tax == 1) {
+                        $query->where('total_tax', '<=', 0);
                     }
-                })
-                
-                ->where('status', 0)
-                ->orderByDesc('invoice_date')
-                ->paginate(10);
-                $sumBeforeTax = InvoiceModel::where('status', 0)->sum('total_before_tax');
-                $sumTax = InvoiceModel::where('status', 0)->sum('total_tax');
-                $sumPayment = InvoiceModel::where('status', 0)->sum('total_payment');
-            if ($request->ajax()) {
-                return response()->json([
-                    'html' => view('admins.pages.purchase_invoice.table', compact('clients','sumBeforeTax','sumTax','sumPayment'))->render(),
-                    'pagination' => $clients->links('pagination::bootstrap-4')->toHtml()
-                ]);
-            }
-
-            return view('admins.pages.purchase_invoice.index', compact('clients','sumBeforeTax','sumTax','sumPayment'));
-        } catch (Exception $e) {
-            Log::error('Failed to get paginated Client list: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to get paginated Client list'], 500);
-        }
-    }
-    public function indexSellerInvoice(Request $request)
-    { 
-        try {
-            $start_date = $request->start_date;
-            $end_date   = $request->end_date;
-            $mst        = $request->mst;
-            $tencongty  = $request->tencongty;
-            $clients = InvoiceModel::query()
-                ->when($mst, function ($query, $mst) {
-                    $query->where('seller_tax_code', 'like', "%$mst%");
-                })
-                ->when($tencongty, function ($query, $tencongty) {
-                    $query->where('seller_name', 'like', "%$tencongty%");
                 })
                 ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
                     try {
@@ -85,21 +49,72 @@ class InvoiceController extends Controller
                         Log::error("Invalid date format: $start_date - $end_date");
                     }
                 })
-                
-                ->where('status', 1)
+
+                ->where('status', 0)
                 ->orderByDesc('invoice_date')
                 ->paginate(10);
-                $sumBeforeTax = InvoiceModel::where('status', 1)->sum('total_before_tax');
-                $sumTax = InvoiceModel::where('status', 1)->sum('total_tax');
-                $sumPayment = InvoiceModel::where('status', 1)->sum('total_payment');
+            $sumBeforeTax = InvoiceModel::where('status', 0)->sum('total_before_tax');
+            $sumTax = InvoiceModel::where('status', 0)->sum('total_tax');
+            $sumPayment = InvoiceModel::where('status', 0)->sum('total_payment');
             if ($request->ajax()) {
                 return response()->json([
-                    'html' => view('admins.pages.sales_invoice.table', compact('clients','sumBeforeTax','sumTax','sumPayment'))->render(),
+                    'html' => view('admins.pages.purchase_invoice.table', compact('clients', 'sumBeforeTax', 'sumTax', 'sumPayment'))->render(),
                     'pagination' => $clients->links('pagination::bootstrap-4')->toHtml()
                 ]);
             }
 
-            return view('admins.pages.sales_invoice.index', compact('clients','sumBeforeTax','sumTax','sumPayment'));
+            return view('admins.pages.purchase_invoice.index', compact('clients', 'sumBeforeTax', 'sumTax', 'sumPayment'));
+        } catch (Exception $e) {
+            Log::error('Failed to get paginated Client list: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to get paginated Client list'], 500);
+        }
+    }
+    public function indexSellerInvoice(Request $request)
+    {
+        try {
+            $start_date = $request->start_date;
+            $end_date   = $request->end_date;
+            $mst        = $request->mst;
+            $tencongty  = $request->tencongty;
+            $tax        = $request->tax;
+            $clients = InvoiceModel::query()
+                ->when($mst, function ($query, $mst) {
+                    $query->where('seller_tax_code', 'like', "%$mst%");
+                })
+                ->when($tencongty, function ($query, $tencongty) {
+                    $query->where('seller_name', 'like', "%$tencongty%");
+                })
+                ->when($tax !== null, function ($query) use ($tax) {
+                    if ($tax == 0) {
+                        $query->where('total_tax', '>', 0);
+                    } elseif ($tax == 1) {
+                        $query->where('total_tax', '<=', 0);
+                    }
+                })
+                ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
+                    try {
+                        $start = Carbon::parse($start_date)->startOfDay();
+                        $end = Carbon::parse($end_date)->endOfDay();
+                        $query->whereBetween('invoice_date', [$start, $end]);
+                    } catch (Exception $e) {
+                        Log::error("Invalid date format: $start_date - $end_date");
+                    }
+                })
+
+                ->where('status', 1)
+                ->orderByDesc('invoice_date')
+                ->paginate(10);
+            $sumBeforeTax = InvoiceModel::where('status', 1)->sum('total_before_tax');
+            $sumTax = InvoiceModel::where('status', 1)->sum('total_tax');
+            $sumPayment = InvoiceModel::where('status', 1)->sum('total_payment');
+            if ($request->ajax()) {
+                return response()->json([
+                    'html' => view('admins.pages.sales_invoice.table', compact('clients', 'sumBeforeTax', 'sumTax', 'sumPayment'))->render(),
+                    'pagination' => $clients->links('pagination::bootstrap-4')->toHtml()
+                ]);
+            }
+
+            return view('admins.pages.sales_invoice.index', compact('clients', 'sumBeforeTax', 'sumTax', 'sumPayment'));
         } catch (Exception $e) {
             Log::error('Failed to get paginated Client list: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to get paginated Client list'], 500);
@@ -112,9 +127,9 @@ class InvoiceController extends Controller
 
             // Xử lý tìm kiếm theo tên hoặc số điện thoại
             if (preg_match('/\d/', $query)) {
-              //  $clients = $this->clientService->getClientByPhone($query);
+                //  $clients = $this->clientService->getClientByPhone($query);
             } else {
-              //  $clients = $this->clientService->getClientByName($query);
+                //  $clients = $this->clientService->getClientByName($query);
             }
 
             if ($request->ajax()) {
@@ -159,28 +174,29 @@ class InvoiceController extends Controller
 
         return back()->with('success', 'Import thành công!');
     }
-    public function deleteInvoice($id){
+    public function deleteInvoice($id)
+    {
         if (!$id) {
             return redirect()->back()->with('error', 'Không tìm thấy dữ liệu');
         }
-    
+
         $deleteInvoice = InvoiceModel::find($id);
         if (!$deleteInvoice) {
             return redirect()->back()->with('error', 'Không tìm thấy hoá đơn');
         }
-    
+
         $deleteInvoice->delete();
         return back()->with('success', 'Xoá thành công');
     }
-    public function deleteInvoiceAll(Request $request) {
+    public function deleteInvoiceAll(Request $request)
+    {
         $ids = $request->data;
-    
+
         if (empty($ids)) {
             return response()->json(['message' => 'Không có dữ liệu để xoá'], 400);
         }
         InvoiceModel::whereIn('id', $ids)->delete();
-    
-        return response()->json(['status'=>'success','message' => 'Xoá thành công']);
+
+        return response()->json(['status' => 'success', 'message' => 'Xoá thành công']);
     }
-    
 }
