@@ -53,11 +53,26 @@ class InvoiceController extends Controller
                 ->where('status', 0)
                 ->orderByDesc('invoice_date')
                 ->paginate(10);
+             $query = InvoiceModel::where('status', 0);
+              if (!empty($tencongty) ) {
+                
+                $query->where('seller_name', 'like', "%$tencongty%");
+            }
+            if (!empty($start_date) && !empty($end_date)) {
                 $start = Carbon::parse($start_date)->startOfDay();
-                $end = Carbon::parse($end_date)->endOfDay();
-            $sumBeforeTax = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 0)->sum('total_before_tax');
-            $sumTax       = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 0)->sum('total_tax');
-            $sumPayment   = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 0)->sum('total_payment');
+                $end   = Carbon::parse($end_date)->endOfDay();
+                $query->whereBetween('invoice_date', [$start, $end]);
+            }
+
+            if ($tax == 0) {
+                $query->where('total_tax', '>', 0);
+            } elseif ($tax == 1) {
+                $query->where('total_tax', '<=', 0);
+            }
+
+            $sumBeforeTax = (clone $query)->sum('total_before_tax');
+            $sumTax       = (clone $query)->sum('total_tax');
+            $sumPayment   = (clone $query)->sum('total_payment');
             if ($request->ajax()) {
                 return response()->json([
                     'html' => view('admins.pages.purchase_invoice.table', compact('clients', 'sumBeforeTax', 'sumTax', 'sumPayment'))->render(),
@@ -106,12 +121,28 @@ class InvoiceController extends Controller
                 ->where('status', 1)
                 ->orderByDesc('invoice_date')
                 ->paginate(10);
+
+
+            $query = InvoiceModel::where('status', 1);
+            if (!empty($tencongty) ) {
+                
+                $query->where('seller_name', 'like', "%$tencongty%");
+            }
+            if (!empty($start_date) && !empty($end_date)) {
                 $start = Carbon::parse($start_date)->startOfDay();
-                $end = Carbon::parse($end_date)->endOfDay();
-              
-            $sumBeforeTax = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 1)->sum('total_before_tax');
-            $sumTax = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 1)->sum('total_tax');
-            $sumPayment = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 1)->sum('total_payment');
+                $end   = Carbon::parse($end_date)->endOfDay();
+                $query->whereBetween('invoice_date', [$start, $end]);
+            }
+
+            if ($tax == 0) {
+                $query->where('total_tax', '>', 0);
+            } elseif ($tax == 1) {
+                $query->where('total_tax', '<=', 0);
+            }
+
+            $sumBeforeTax = (clone $query)->sum('total_before_tax');
+            $sumTax       = (clone $query)->sum('total_tax');
+            $sumPayment   = (clone $query)->sum('total_payment');
             if ($request->ajax()) {
                 return response()->json([
                     'html' => view('admins.pages.sales_invoice.table', compact('clients', 'sumBeforeTax', 'sumTax', 'sumPayment'))->render(),
