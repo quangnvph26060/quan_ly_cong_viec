@@ -53,9 +53,11 @@ class InvoiceController extends Controller
                 ->where('status', 0)
                 ->orderByDesc('invoice_date')
                 ->paginate(10);
-            $sumBeforeTax = InvoiceModel::where('status', 0)->sum('total_before_tax');
-            $sumTax = InvoiceModel::where('status', 0)->sum('total_tax');
-            $sumPayment = InvoiceModel::where('status', 0)->sum('total_payment');
+                $start = Carbon::parse($start_date)->startOfDay();
+                $end = Carbon::parse($end_date)->endOfDay();
+            $sumBeforeTax = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 0)->sum('total_before_tax');
+            $sumTax       = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 0)->sum('total_tax');
+            $sumPayment   = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 0)->sum('total_payment');
             if ($request->ajax()) {
                 return response()->json([
                     'html' => view('admins.pages.purchase_invoice.table', compact('clients', 'sumBeforeTax', 'sumTax', 'sumPayment'))->render(),
@@ -104,9 +106,12 @@ class InvoiceController extends Controller
                 ->where('status', 1)
                 ->orderByDesc('invoice_date')
                 ->paginate(10);
-            $sumBeforeTax = InvoiceModel::where('status', 1)->sum('total_before_tax');
-            $sumTax = InvoiceModel::where('status', 1)->sum('total_tax');
-            $sumPayment = InvoiceModel::where('status', 1)->sum('total_payment');
+                $start = Carbon::parse($start_date)->startOfDay();
+                $end = Carbon::parse($end_date)->endOfDay();
+              
+            $sumBeforeTax = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 1)->sum('total_before_tax');
+            $sumTax = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 1)->sum('total_tax');
+            $sumPayment = InvoiceModel::whereBetween('invoice_date', [$start, $end])->where('status', 1)->sum('total_payment');
             if ($request->ajax()) {
                 return response()->json([
                     'html' => view('admins.pages.sales_invoice.table', compact('clients', 'sumBeforeTax', 'sumTax', 'sumPayment'))->render(),
